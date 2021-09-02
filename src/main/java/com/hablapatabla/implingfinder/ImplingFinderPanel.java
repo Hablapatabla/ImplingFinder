@@ -24,14 +24,12 @@ public class ImplingFinderPanel extends PluginPanel {
     ArrayList<ImplingFinderImpPanel> impList = new ArrayList<>();
     JPanel impListPanel = new JPanel();
 
-    private static String[] TargetableImplings = {"Eclectic", "Magpie", "Ninja", "Dragon"};
+    //private static String[] TargetableImplings = {"Eclectic", "Magpie", "Ninja", "Dragon"};
     private Logger logger = LoggerFactory.getLogger(ImplingFinderPanel.class);
     private JScrollPane scrollPane;
     private GridBagConstraints c = new GridBagConstraints();
 
     protected ImplingFinderPlugin plugin;
-
-    final static int MAX_ACTOR_VIEW_RANGE = 15;
 
     @Getter
     @Setter
@@ -119,7 +117,7 @@ public class ImplingFinderPanel extends PluginPanel {
         ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
         if (container == null)
             return;
-        logger.debug("POPULATE NPCS");
+        //logger.debug("POPULATE NPCS");
         c.gridy = 0;
         c.weighty = 0;
 
@@ -130,7 +128,6 @@ public class ImplingFinderPanel extends PluginPanel {
 
         ArrayList<Item> inventory = new ArrayList<Item>();
         for (Item item : container.getItems()) {
-            //if (item.getQuantity() > 0) Uncomment to get rid of weird dwarf
             inventory.add(item);
         }
 
@@ -150,43 +147,4 @@ public class ImplingFinderPanel extends PluginPanel {
         repaint();
         revalidate();
     }
-
-    /*
-    public void populate() {
-        ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
-        if (container == null)
-            return;
-        c.gridy = 0;
-        c.weighty = 0;
-
-        for (ImplingFinderImpPanel p : impList) {
-            impListPanel.remove(p);
-        }
-        impList.clear();
-
-        ArrayList<ImplingFinderImpPanel> implings = new ArrayList<ImplingFinderImpPanel>();
-        Set<Item> inventory = new HashSet<Item>();
-        for (Item item : container.getItems()) {
-            //if (item.getQuantity() > 0) Uncomment to get rid of weird dwarf
-                inventory.add(item);
-        }
-
-        int world = client.getWorld();
-        for (Item uniqueItem : inventory) {
-            AsyncBufferedImage icon = itemManager.getImage(uniqueItem.getId());
-            String name = client.getItemDefinition(uniqueItem.getId()).getName();
-            ImplingFinderImpPanel imp = new ImplingFinderImpPanel(icon, name, world, uniqueItem.getId());
-            implings.add(imp);
-        }
-
-        for (ImplingFinderImpPanel p : implings) {
-            impListPanel.add(p, c);
-            c.gridy += 1;
-            impList.add(p);
-        }
-
-        repaint();
-        revalidate();
-    }*/
-
 }

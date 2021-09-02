@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import okhttp3.*;
-import okio.Buffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Singleton
@@ -36,22 +34,6 @@ public class ImplingFinderWebManager {
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderWebManager.class);
 
-    private List<ImplingFinderData> implingsToUpload = new LinkedList<>();
-
-
-    public void storeImpling(ImplingFinderData impling) {
-        synchronized (this) {
-            implingsToUpload.add(impling);
-        }
-    }
-
-    public void storeManyImplings(ArrayList<ImplingFinderData> implings) {
-        synchronized (this) {
-            for (ImplingFinderData i : implings)
-                implingsToUpload.add(i);
-        }
-    }
-
     private ArrayList<ImplingFinderData> parseData(JsonArray j)
     {
         ArrayList<ImplingFinderData> l = new ArrayList<>();
@@ -69,7 +51,6 @@ public class ImplingFinderWebManager {
 
     private ArrayList<ImplingFinderData> parseData(JsonObject o)
     {
-        logger.debug("PARSE DATA O");
         JsonArray arr = o.get("items").getAsJsonArray();
         return parseData(arr);
     }
@@ -94,7 +75,7 @@ public class ImplingFinderWebManager {
                             String responseBody = response.body().string();
                             logger.debug(responseBody);
                             JsonObject j = new Gson().fromJson(responseBody, JsonObject.class);
-                            plugin.setRemotelyFetchedNpcs(parseData(j));
+                            plugin.setRemotelyFetchedImplings(parseData(j));
                             response.close();
 
                         } catch (Exception e) {
@@ -121,22 +102,20 @@ public class ImplingFinderWebManager {
         try {
             logger.debug("Post Malone");
             List<Object> is = new ArrayList<Object>();
-            for (ImplingFinderData imp : implingsToUpload)
+            for (ImplingFinderData imp : plugin.getImplingsToUpload())
                 is.add(imp);
 
+            // Oracle cloud only handles 1 JSON object to be posted at a time
             for (Object o : is) {
                 Request r = new Request.Builder()
                         .url(implingPostEndpoint)
                         .addHeader(CONTENT, JSON)
                         .post(RequestBody.create(JSONTYPE, gson.toJson(o)))
                         .build();
-                String postStr = gson.toJson(o);
-                //logger.debug("POST STR: " + postStr);
-                //logger.error(r.toString());
-                logger.error("made it past build");
-                Buffer b = new Buffer();
+
+                /*Buffer b = new Buffer();
                 r.body().writeTo(b);
-                logger.error(b.readUtf8());
+                logger.error(b.readUtf8());*/
 
                 okHttpClient.newCall(r).enqueue(new Callback() {
                     @Override
@@ -148,7 +127,6 @@ public class ImplingFinderWebManager {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (response.isSuccessful()) {
-                            logger.debug("helloo");
                             logger.debug(response.body().string());
                             response.close();
                         } else {
@@ -160,7 +138,6 @@ public class ImplingFinderWebManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.implingsToUpload.clear();
         plugin.clearImplingsToUpload();
     }
 }

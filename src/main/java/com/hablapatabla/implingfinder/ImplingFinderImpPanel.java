@@ -161,8 +161,7 @@ class ImplingFinderImpPanel extends JPanel {
     private void matchComponentBackground(JPanel panel, Color color)
     {
         panel.setBackground(color);
-        for (Component c : panel.getComponents())
-        {
+        for (Component c : panel.getComponents()) {
             c.setBackground(color);
         }
     }

@@ -31,12 +31,9 @@ import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
@@ -87,12 +84,13 @@ public class ImplingFinderPlugin extends Plugin {
     @Getter(AccessLevel.PACKAGE)
     private ArrayList<ImplingFinderData> workingImplings = new ArrayList<>();
 
+    @Getter(AccessLevel.PACKAGE)
     private ArrayList<ImplingFinderData> implingsToUpload = new ArrayList<>();
 
     @Setter(AccessLevel.PACKAGE)
-    private ArrayList<ImplingFinderData> remotelyFetchedNpcs = new ArrayList<>();
+    private ArrayList<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
 
-    private ArrayList<ImplingFinderData> previousHighlightedNpcs = new ArrayList<>();
+    private ArrayList<ImplingFinderData> previousHighlightedImplings = new ArrayList<>();
 
     @Provides
     ImplingFinderConfig provideConfig(ConfigManager configManager) {
@@ -114,34 +112,18 @@ public class ImplingFinderPlugin extends Plugin {
     private static final int API_REQUEST_TIME = 10;
 
     private static final int MAX_ACTOR_VIEW_RANGE = 75;
-    private static final int FUNGI = 8690;
-    public static final int BABY_IMPLING = 1635;
-    public static final int YOUNG_IMPLING = 1636;
-    public static final int GOURMET_IMPLING = 1637;
-    public static final int EARTH_IMPLING = 1638;
-    public static final int ESSENCE_IMPLING = 1639;
-    public static final int ECLECTIC_IMPLING = 1640;
-    public static final int NATURE_IMPLING = 1641;
-    public static final int MAGPIE_IMPLING = 1642;
-    public static final int NINJA_IMPLING = 1643;
-    public static final int CRYSTAL_IMPLING = 8741;
-    public static final int DRAGON_IMPLING = 1644;
-    public static final int LUCKY_IMPLING = 7233;
+
 
     private List<Object> serializedData = new ArrayList<>();
     @Override
-    protected void startUp() throws Exception
-    {
+    protected void startUp() throws Exception {
         logger = LoggerFactory.getLogger(ImplingFinderPlugin.class);
-        //overlayManager.add(overlay);
         implingCapacity = config.implingFinderMaxImplings();
         loadPluginPanel();
     }
 
     @Override
-    protected void shutDown() throws Exception
-    {
-        //overlayManager.remove(overlay);
+    protected void shutDown() throws Exception {
         clientToolbar.removeNavigation(button);
     }
 
@@ -195,8 +177,8 @@ public class ImplingFinderPlugin extends Plugin {
             return;
 
         if (workingImplings.size() >= implingCapacity) {
-            logger.debug("Impling capacity: " + Integer.toString(implingCapacity) + " , size: " + Integer.toString(workingImplings.size()));
-            logger.debug("Removing from highlighted, onnpcspawned");
+            //logger.debug("Impling capacity: " + Integer.toString(implingCapacity) + " , size: " + Integer.toString(workingImplings.size()));
+            //logger.debug("Removing from highlighted, onnpcspawned");
             workingImplings.remove(workingImplings.size()-1);
         }
         ImplingFinderData imp = makeImp(npc);
@@ -208,32 +190,11 @@ public class ImplingFinderPlugin extends Plugin {
         return workingImplings.stream().anyMatch(npc -> npc.getNpcindex() == index);
     }
 
-/*
-    @Subscribe
-    public void onNpcDespawned(NpcDespawned npcDespawned) {
-        final NPC npc = npcDespawned.getNpc();
-        logger.debug("npc despawn: " + npc.getIndex());
-        //highlightedNpcs.remove(npc);
-    }*/
-
     private static boolean isInViewRange(WorldPoint wp1, WorldPoint wp2)
     {
         int distance = wp1.distanceTo(wp2);
         return distance < MAX_ACTOR_VIEW_RANGE;
     }
-
-    /*private void pruneDistantNpcs() {
-        Set<NPC> distantNpcs = new HashSet<>();
-        for (ImplingFinderData npc : highlightedNpcs) {
-            if (!isInViewRange(npc.getEntity().getWorldLocation(), client.getLocalPlayer().getWorldLocation()))
-                distantNpcs.add(npc.getEntity());
-        }
-        for (NPC npc : distantNpcs) {
-            pruneNpcByIndex(npc.getIndex());
-        }
-    }*/
-
-
 
     private void pruneNpcByIndex(int index) {
         workingImplings.removeIf(npc -> npc.getNpcindex() == index);
@@ -246,43 +207,8 @@ public class ImplingFinderPlugin extends Plugin {
         return ImplingFinderEnum.getImplingConfigStatus(id).getFunc().apply(config);
     }
 
-    private Queue<ImplingFinderData> reverse(Queue<ImplingFinderData> q) {
-        List<ImplingFinderData> collect = q.stream().collect(Collectors.toList());
-        Collections.reverse(collect);
-        return new LinkedList<>(collect);
-    }
-    /*
-    @Schedule(
-            period = NPC_SEARCH_REFRESH_TIME,
-            unit = ChronoUnit.SECONDS,
-            asynchronous = true
-    )
-    private void fetchNearbyNpcs() {
-        List<NPC> npcs = client.getNpcs();
-        logger.debug("nothing?");
-        for (NPC n : npcs) {
-            logger.debug("PRE");
-            if (n.getName() != null && npcAllowedInConfig(n) && !npcAlreadyInList(n.getIndex())) {
-                if (highlightedNpcs.size() >= implingCapacity) {
-                    logger.debug("Removing from highlighted, fetchnearbynpcs");
-                    highlightedNpcs.poll();
-                }
-                logger.debug("POST1");
-                highlightedNpcs.add(makeImp(n));
-            }
-            logger.debug("POST2");
-        }
-    } */
-
-    String generateTimestamp(int timestamp, ZoneId zoneId) {
-        final ZonedDateTime time = ZonedDateTime.ofInstant(
-                Instant.ofEpochSecond(timestamp), zoneId);
-
-        return formatter.format(Date.from(time.toInstant()));
-    }
-
     private ImplingFinderData makeImp(NPC n) {
-        logger.error("MAKING IMP   " + n.getIndex() + "   " +n.getId());
+        //logger.error("MAKING IMP   " + n.getIndex() + "   " +n.getId());
         int world = client.getWorld();
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
@@ -296,8 +222,7 @@ public class ImplingFinderPlugin extends Plugin {
     }
 
     public BufferedImage getMapArrow() {
-        if (mapArrow != null)
-        {
+        if (mapArrow != null) {
             return mapArrow;
         }
 
@@ -305,13 +230,9 @@ public class ImplingFinderPlugin extends Plugin {
         return mapArrow;
     }
 
-    /*
-        Zanaris top left: (X: 2563 Y: 4348)
-        Zanaris bottom right: (X: 2620 Y: 4291)
-     */
     public void addMapPoints(WorldPoint... points) {
         WorldPoint p = client.getLocalPlayer().getWorldLocation();
-        System.out.println("Local WP: " + p.toString());
+        //System.out.println("Local WP: " + p.toString());
         if (mapPointSet) {
             mapPointSet = false;
             worldMapPointManager.removeIf(ImplingFinderWorldMapPoint.class::isInstance);
@@ -328,26 +249,17 @@ public class ImplingFinderPlugin extends Plugin {
     }
 
     private void interpolateRemoteNpcs() {
-        //logger.debug("INTERPOLATE");
-        //boolean added = false;
-        for (ImplingFinderData imp : remotelyFetchedNpcs) {
+        for (ImplingFinderData imp : remotelyFetchedImplings) {
             if (!workingImplings.contains(imp)) {
                 if (!npcAllowedInConfig(imp.getNpcid()))
                     continue;
                 if (workingImplings.size() >= implingCapacity)
                     workingImplings.remove(workingImplings.size()-1);
-                //logger.debug("INTERPOLATE ADD");
                 workingImplings.add(imp);
-                //added = true;
             }
         }
-        //if (added)
-        //    this.remotelyFetchedNpcs.clear();
     }
 
-   /* private int specificImplingTypeRequested() {
-
-    }*/
 
     @Schedule(
             period = NPC_UPLOAD_TIME,
@@ -358,9 +270,7 @@ public class ImplingFinderPlugin extends Plugin {
         if (implingsToUpload.size() == 0)
             return;
 
-        webManager.storeManyImplings(implingsToUpload);
         webManager.postImplings();
-        //implingsToUpload.clear();
     }
 
     public void clearImplingsToUpload() {
@@ -378,19 +288,14 @@ public class ImplingFinderPlugin extends Plugin {
             this.workingImplings.clear();
             SwingUtilities.invokeLater(() -> panel.populateNpcs(workingImplings));
             panel.setClearRequested(false);
-            this.remotelyFetchedNpcs.clear();
-            //this.previousHighlightedNpcs.clear();
+            this.remotelyFetchedImplings.clear();
             updatePanels();
         }
 
         if (panel.isFetchRequested()) {
-            logger.debug("FETCH REQUESTED, REMOTE SIZE " + remotelyFetchedNpcs.size() + "  working size " + workingImplings.size() + " previous size " + previousHighlightedNpcs.size());
+            //logger.debug("FETCH REQUESTED, REMOTE SIZE " + remotelyFetchedNpcs.size() + "  working size " + workingImplings.size() + " previous size " + previousHighlightedNpcs.size());
             webManager.getData();
             panel.setFetchRequested(false);
-            logger.debug("New remoet size: " + remotelyFetchedNpcs.size());
-            //interpolateRemoteNpcs();
-            //logger.debug("AFTER FETCH REMOT SIZE " + remotelyFetchedNpcs.size() + "  wokring size" + workingImplings.size() + " previous size " + previousHighlightedNpcs.size());
-            //updatePanels();
         }
     }
 
@@ -401,29 +306,11 @@ public class ImplingFinderPlugin extends Plugin {
     )
     public void updatePanels()
     {
-        //pruneDistantNpcs();
-        /*for (NPC n : highlightedNpcs) {
-            logger.debug(n.getWorldLocation() + "  " + n.getWorldArea());
-        }*/
-        //logger.debug("BEFORE UPDATE, REMOTE SIZE" + Integer.toString(remotelyFetchedNpcs.size()));
-        /*for (ImplingFinderData d : remotelyFetchedNpcs) {
-            System.out.println(d);
-        }*/
         interpolateRemoteNpcs();
-        if (!workingImplings.equals(previousHighlightedNpcs)) {
-            logger.debug("DURING UPDATE");
-            //.debug("updating panels");
-            //interpolateRemoteNpcs();
-            //Collections.sort(workingImplings);
-            /*for (ImplingFinderData d : highlightedNpcs)
-                logger.debug(d.toString());*/
+        if (!workingImplings.equals(previousHighlightedImplings)) {
             SwingUtilities.invokeLater(() -> panel.populateNpcs(workingImplings));
-            previousHighlightedNpcs = null;
-            previousHighlightedNpcs = new ArrayList<ImplingFinderData>(workingImplings);
+            previousHighlightedImplings = null;
+            previousHighlightedImplings = new ArrayList<ImplingFinderData>(workingImplings);
         }
-        //logger.debug("Len: " + highlightedNpcs.size());
-
-        //SwingUtilities.invokeLater(() -> panel.populate());
     }
-
 }

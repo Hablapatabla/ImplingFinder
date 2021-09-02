@@ -39,6 +39,7 @@ public class ImplingFinderData implements Comparable {
     @Getter
     private String discoveredtime;
 
+    //TODO: Try other formats for better comparison (potentially yyyy-mm-ddTHH:mm:ss)
     private static SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
 
     private static Logger logger = LoggerFactory.getLogger(ImplingFinderData.class);
@@ -70,6 +71,8 @@ public class ImplingFinderData implements Comparable {
         return Integer.valueOf(time.substring(11, 19).replaceAll(":", ""));
     }
 
+    //TODO: make time comparison better. A 10pm impling from yesterday ranks higher than a 7pm from today
+    //      alternatively, try converting from string to zoneddatetime and see if there are comparison funcs
     @Override
     public int compareTo(Object o) {
         ImplingFinderData other = (ImplingFinderData) o;
