@@ -1,13 +1,13 @@
-package com.example;
+package com.hablapatabla.implingfinder;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class ExamplePluginTest
+public class ImplingFinderPluginTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(ExamplePlugin.class);
+		ExternalPluginManager.loadBuiltin(ImplingFinderPlugin.class);
 		RuneLite.main(args);
 	}
 }
