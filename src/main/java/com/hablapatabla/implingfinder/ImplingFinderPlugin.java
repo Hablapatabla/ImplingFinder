@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -152,7 +153,8 @@ public class ImplingFinderPlugin extends Plugin {
         int world = client.getWorld();
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
-        return new ImplingFinderData(n.getId(), n.getIndex(), world, point.getX(), point.getY(), point.getPlane(), ZonedDateTime.now().toString());
+        return new ImplingFinderData(n.getId(), n.getIndex(), world, point.getX(), point.getY(), point.getPlane(),
+                ZonedDateTime.now(ZoneId.of("UTC")).toString());
     }
 
     public BufferedImage getClueScrollImage() {
