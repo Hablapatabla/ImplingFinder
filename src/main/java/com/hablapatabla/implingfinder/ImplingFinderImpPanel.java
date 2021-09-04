@@ -17,9 +17,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +35,13 @@ class ImplingFinderImpPanel extends JPanel {
 
     // npc id to ItemID
     private Map<Integer, Integer> thumbnails = new HashMap<Integer, Integer>() {{
-        put(NpcID.BABY_IMPLING, ItemID.BABY_IMPLING_JAR);
+        /*put(NpcID.BABY_IMPLING, ItemID.BABY_IMPLING_JAR);
         put(NpcID.YOUNG_IMPLING, ItemID.YOUNG_IMPLING_JAR);
         put(NpcID.GOURMET_IMPLING, ItemID.GOURMET_IMPLING_JAR);
         put(NpcID.EARTH_IMPLING, ItemID.EARTH_IMPLING_JAR);
-        put(NpcID.ESSENCE_IMPLING, ItemID.ESSENCE_IMPLING_JAR);
+        put(NpcID.ESSENCE_IMPLING, ItemID.ESSENCE_IMPLING_JAR);*/
         put(NpcID.ECLECTIC_IMPLING, ItemID.ECLECTIC_IMPLING_JAR);
-        put(NpcID.NATURE_IMPLING, ItemID.NATURE_IMPLING_JAR);
+        //put(NpcID.NATURE_IMPLING, ItemID.NATURE_IMPLING_JAR);
         put(NpcID.MAGPIE_IMPLING, ItemID.MAGPIE_IMPLING_JAR);
         put(NpcID.NINJA_IMPLING, ItemID.NINJA_IMPLING_JAR);
         put(NpcID.CRYSTAL_IMPLING, ItemID.CRYSTAL_IMPLING_JAR);
@@ -60,38 +62,33 @@ class ImplingFinderImpPanel extends JPanel {
         setToolTipText(ImplingFinderEnum.findById(data.getNpcid()).getName());
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         panels.add(this);
+        setBorder(new EmptyBorder(7, 0, 0, 0));
 
         WorldPoint implingWorldPoint = new WorldPoint(data.getXcoord(), data.getYcoord(), data.getPlane());
 
         MouseAdapter itemPanelMouseListener = new MouseAdapter()
         {
             @Override
-            public void mouseEntered(MouseEvent e)
-            {
+            public void mouseEntered(MouseEvent e) {
                 for (JPanel p : panels)
                     matchComponentBackground(p, ColorScheme.DARK_GRAY_HOVER_COLOR);
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
-            public void mouseExited(MouseEvent e)
-            {
+            public void mouseExited(MouseEvent e) {
                 for (JPanel p : panels)
                     matchComponentBackground(p, ColorScheme.DARKER_GRAY_COLOR);
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
 
             @Override
-            public void mouseReleased(MouseEvent e)
-            {
+            public void mouseReleased(MouseEvent e) {
                 plugin.addMapPoints(implingWorldPoint);
-                //grandExchangePlugin.openGeLink(name, itemID);
             }
         };
 
         addMouseListener(itemPanelMouseListener);
-
-        //setBorder(new EmptyBorder(5, 5, 5, 0));
 
         final JLabel itemIcon = new JLabel();
         itemIcon.setPreferredSize(ICON_SIZE);
@@ -119,18 +116,36 @@ class ImplingFinderImpPanel extends JPanel {
         itemName.setText(ImplingFinderEnum.findById(data.getNpcid()).getName());
         rightPanel.add(itemName);
 
-        JLabel middleTextLabel = new JLabel();
-        middleTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_PRICE);
+        JPanel middleTextPanel = new JPanel(new BorderLayout());
+        middleTextPanel.setBackground(background);
+        panels.add(middleTextPanel);
 
-        middleTextLabel.setText("World: " + Integer.toString(data.getWorld()));
-        rightPanel.add(middleTextLabel);
+        JLabel middleLeftTextLabel = new JLabel();
+        middleLeftTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_PRICE);
+
+        middleLeftTextLabel.setText("World: " + data.getWorld());
+        middleTextPanel.add(middleLeftTextLabel, BorderLayout.WEST);
+
+        JLabel middleRightTextLabel = new JLabel();
+        middleRightTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
+        String day;
+        ZonedDateTime dt = ZonedDateTime.parse(data.getDiscoveredtime());
+        if (dt.toLocalDate().equals(LocalDate.now(dt.getZone())))
+            day = "Today";
+        else {
+            long daysBetween = ChronoUnit.DAYS.between(dt, ZonedDateTime.now(dt.getZone()));
+            day = Long.toString(daysBetween) + " day(s) ago";
+        }
+        middleRightTextLabel.setText(day);
+        middleTextPanel.add(middleRightTextLabel, BorderLayout.EAST);
+        rightPanel.add(middleTextPanel);
 
         JPanel bottomTextRowPanel = new JPanel(new BorderLayout());
         bottomTextRowPanel.setBackground(background);
         panels.add(bottomTextRowPanel);
 
         JLabel bottomLeftTextLabel = new JLabel();
-        bottomLeftTextLabel.setText(ZonedDateTime.parse(data.getDiscoveredtime()).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG)));
+        bottomLeftTextLabel.setText(dt.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG)));
         bottomLeftTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
         bottomTextRowPanel.add(bottomLeftTextLabel, BorderLayout.WEST);
 
@@ -149,22 +164,16 @@ class ImplingFinderImpPanel extends JPanel {
 
         rightPanel.add(bottomTextRowPanel);
 
-        //logger.debug(data.getIndex() + "  " + data.getId() + "  " + data.getWorld() + "  " + data.getXcoord() + "  " + data.getYcoord() + "  " + data.getPlane() + "  " + data.getTimestamp());
         for (JPanel p : panels)
             matchComponentBackground(p, ColorScheme.DARKER_GRAY_COLOR);
 
-        ZonedDateTime dt = ZonedDateTime.parse(data.getDiscoveredtime().toString());
-        //.debug("Success converting: " + dt.toString());
         add(rightPanel, BorderLayout.CENTER);
     }
 
-    private void matchComponentBackground(JPanel panel, Color color)
-    {
+    private void matchComponentBackground(JPanel panel, Color color) {
         panel.setBackground(color);
         for (Component c : panel.getComponents()) {
             c.setBackground(color);
         }
     }
-
-
 }

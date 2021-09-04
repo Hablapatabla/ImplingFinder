@@ -16,7 +16,8 @@ import java.util.List;
 
 @Singleton
 public class ImplingFinderWebManager {
-    protected static final String implingGetEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+    protected static final String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+    protected static final String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings/";
     protected static final String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
     protected static final String CONTENT = "Content-Type";
     protected static final String JSON = "application/json";
@@ -34,12 +35,14 @@ public class ImplingFinderWebManager {
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderWebManager.class);
 
-    private ArrayList<ImplingFinderData> parseData(JsonArray j)
-    {
+    private ArrayList<ImplingFinderData> parseData(JsonArray j) {
         ArrayList<ImplingFinderData> l = new ArrayList<>();
-        JsonElement je= j.get(0);
-        for (JsonElement jsonElement : j)
-        {
+        if (j.size() == 0) {
+            return l;
+        }
+
+        JsonElement je = j.get(0);
+        for (JsonElement jsonElement : j) {
             JsonObject jObj = jsonElement.getAsJsonObject();
             ImplingFinderData d = new ImplingFinderData(jObj.get("npcid").getAsInt(),
                     jObj.get("npcindex").getAsInt(), jObj.get("world").getAsInt(), jObj.get("xcoord").getAsInt(),
@@ -49,23 +52,33 @@ public class ImplingFinderWebManager {
         return l;
     }
 
-    private ArrayList<ImplingFinderData> parseData(JsonObject o)
-    {
+    private ArrayList<ImplingFinderData> parseData(JsonObject o) {
         JsonArray arr = o.get("items").getAsJsonArray();
         return parseData(arr);
     }
 
 
-    protected void getData() {
+    protected void getData(Integer id) {
         try {
-            Request r = new Request.Builder()
-                    .url(implingGetEndpoint)
-                    .build();
+            //logger.error("GET DATA");
+            Request r;
+            if (id == -1) {
+                r = new Request.Builder()
+                        .url(implingGetAnyEndpoint)
+                        .build();
+            } else {
+                String endpoint = implingGetIdEndpoint;
+                endpoint += Integer.toString(id);
+                r = new Request.Builder()
+                        .url(endpoint)
+                        .build();
+            }
 
             okHttpClient.newCall(r).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    logger.error("error GETting data");
+                    logger.error("Get failed");
+                    logger.error(e.toString());
                 }
 
                 @Override
@@ -73,22 +86,16 @@ public class ImplingFinderWebManager {
                     if (response.isSuccessful()) {
                         try {
                             String responseBody = response.body().string();
-                            logger.debug(responseBody);
                             JsonObject j = new Gson().fromJson(responseBody, JsonObject.class);
                             plugin.setRemotelyFetchedImplings(parseData(j));
                             response.close();
-
+                            plugin.updatePanels();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
                     } else {
-                        logger.error("unsuccessful GET");
-                        try {
-                            logger.error(response.body().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        logger.error("GET responsed unsuccessful");
                     }
                 }
             });
@@ -100,10 +107,8 @@ public class ImplingFinderWebManager {
 
     protected void postImplings() {
         try {
-            logger.debug("Post Malone");
-            List<Object> is = new ArrayList<Object>();
-            for (ImplingFinderData imp : plugin.getImplingsToUpload())
-                is.add(imp);
+            List<Object> is = new ArrayList<>();
+            is.addAll(plugin.getImplingsToUpload());
 
             // Oracle cloud only handles 1 JSON object to be posted at a time
             for (Object o : is) {
@@ -113,21 +118,16 @@ public class ImplingFinderWebManager {
                         .post(RequestBody.create(JSONTYPE, gson.toJson(o)))
                         .build();
 
-                /*Buffer b = new Buffer();
-                r.body().writeTo(b);
-                logger.error(b.readUtf8());*/
-
                 okHttpClient.newCall(r).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        logger.error("failed to post implings");
+                        logger.error("Failed to post implings");
                         logger.debug(e.toString());
                     }
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (response.isSuccessful()) {
-                            logger.debug(response.body().string());
                             response.close();
                         } else {
                             logger.error("On response error" + response.body().string());
@@ -138,6 +138,6 @@ public class ImplingFinderWebManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        plugin.clearImplingsToUpload();
+        plugin.getImplingsToUpload().clear();
     }
 }

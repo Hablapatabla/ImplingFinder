@@ -28,21 +28,18 @@ class ImplingFinderWorldMapPoint extends WorldMapPoint
         this.plugin = plugin;
         this.setSnapToEdge(true);
         this.setJumpOnClick(true);
-        //this.setName("Clue Scroll");
         this.setImage(worldImage);
         this.setImagePoint(worldImagePoint);
     }
 
     @Override
-    public void onEdgeSnap()
-    {
+    public void onEdgeSnap() {
         this.setImage(plugin.getClueScrollImage());
         this.setImagePoint(null);
     }
 
     @Override
-    public void onEdgeUnsnap()
-    {
+    public void onEdgeUnsnap() {
         this.setImage(worldImage);
         this.setImagePoint(worldImagePoint);
     }
