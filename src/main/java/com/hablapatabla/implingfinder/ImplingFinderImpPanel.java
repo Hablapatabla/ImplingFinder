@@ -41,7 +41,7 @@ class ImplingFinderImpPanel extends JPanel {
         put(NpcID.GOURMET_IMPLING, ItemID.GOURMET_IMPLING_JAR);
         put(NpcID.EARTH_IMPLING, ItemID.EARTH_IMPLING_JAR);
         put(NpcID.ESSENCE_IMPLING, ItemID.ESSENCE_IMPLING_JAR);*/
-        put(NpcID.ECLECTIC_IMPLING, ItemID.ECLECTIC_IMPLING_JAR);
+        //put(NpcID.ECLECTIC_IMPLING, ItemID.ECLECTIC_IMPLING_JAR);
         //put(NpcID.NATURE_IMPLING, ItemID.NATURE_IMPLING_JAR);
         put(NpcID.MAGPIE_IMPLING, ItemID.MAGPIE_IMPLING_JAR);
         put(NpcID.NINJA_IMPLING, ItemID.NINJA_IMPLING_JAR);
@@ -146,7 +146,9 @@ class ImplingFinderImpPanel extends JPanel {
         panels.add(bottomTextRowPanel);
 
         JLabel bottomLeftTextLabel = new JLabel();
-        bottomLeftTextLabel.setText(dt.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG)));
+        String aaa = dt.withZoneSameInstant(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG));
+        bottomLeftTextLabel.setText(aaa);
         bottomLeftTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
         bottomTextRowPanel.add(bottomLeftTextLabel, BorderLayout.WEST);
 

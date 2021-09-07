@@ -16,7 +16,7 @@ public enum ImplingFinderEnum {
     GOURMET(1637, "Gourmet impling"),
     EARTH(1638, "Earth impling"),
     ESSENCE(1639, "Essence impling"),*/
-    ECLECTIC(1640, "Eclectic impling"),
+    //ECLECTIC(1640, "Eclectic impling"),
     //NATURE(1641, "Nature impling"),
     MAGPIE(1642, "Magpie impling"),
     NINJA(1643, "Ninja impling"),

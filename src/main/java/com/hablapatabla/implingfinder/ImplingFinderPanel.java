@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 public class ImplingFinderPanel extends PluginPanel {
     private static final String RESULTS_PANEL = "RESULTS_PANEL";
     private static final String ERROR_PANEL = "ERROR_PANEL";
+    private static final String SPLASH_PANEL = "SPLASH_PANEL";
     private static String[] TargetableImplings = {"Any", "Eclectic", "Magpie", "Ninja", "Crystal", "Dragon", "Lucky"};
 
     private GridBagConstraints c = new GridBagConstraints();
@@ -29,6 +31,7 @@ public class ImplingFinderPanel extends PluginPanel {
     private JPanel impListPanel = new JPanel();
     private JPanel container = new JPanel(cardLayout);
     private final PluginErrorPanel errorPanel = new PluginErrorPanel();
+    private final ImplingFinderSplashPanel splashPanel = new ImplingFinderSplashPanel();
 
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderPanel.class);
@@ -49,6 +52,9 @@ public class ImplingFinderPanel extends PluginPanel {
     @Getter
     @Setter
     private boolean fetchTargetedRequested = false;
+
+    @Getter
+    private boolean splashRequested = false;
 
     @Inject
     private ItemManager itemManager;
@@ -138,12 +144,43 @@ public class ImplingFinderPanel extends PluginPanel {
                 "Either I have no implings to show you, or an error has occurred.");
         errorWrapper.add(errorPanel, BorderLayout.NORTH);
 
+
+        JPanel splashWrapper = new JPanel(new BorderLayout());
+        splashWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
+        splashPanel.setContent("Welcome to Impling Finder!",
+                " This plugin watches for implings around you, and uploads the locations of implings of Ninja quality" +
+                        " or higher to an external server. You may have had Runelite ask your for your IP, don't worry," +
+                        " this is just used to upload implings to the server. Uploads" +
+                        " are only done when implings are actually found, so this plugin has virtually 0 network usage. Please" +
+                        " raise an issue in the github repo if you find one, or would like to request a feature! This plugin" +
+                        " crowdsources data, so the more people using, the better. Tell your friends to install!" +
+                        "\nMake sure to go to the config and check \'Splash Seen\' so that you don't see this splash page again.\n\n");
+        splashWrapper.add(splashPanel, BorderLayout.NORTH);
+
+        JButton getStartedButton = new JButton("Let's get started");
+        getStartedButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                continuePastSplash();
+            }
+        });
+        splashWrapper.add(getStartedButton, BorderLayout.SOUTH);
+
+        container.add(splashWrapper, SPLASH_PANEL);
         container.add(impsWrapper, RESULTS_PANEL);
         container.add(errorWrapper, ERROR_PANEL);
 
         cardLayout.show(container, ERROR_PANEL);
 
         this.add(container, BorderLayout.CENTER);
+    }
+
+    protected void showSplash() {
+        cardLayout.show(container, SPLASH_PANEL);
+    }
+
+    private void continuePastSplash() {
+        cardLayout.show(container, ERROR_PANEL);
     }
 
     public void populateNpcs(ArrayList<ImplingFinderData> npcs) {

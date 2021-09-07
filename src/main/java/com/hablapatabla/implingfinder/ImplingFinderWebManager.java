@@ -16,13 +16,9 @@ import java.util.List;
 
 @Singleton
 public class ImplingFinderWebManager {
-    protected static final String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
-    protected static final String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings/";
-    protected static final String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
     protected static final String CONTENT = "Content-Type";
     protected static final String JSON = "application/json";
     private static final MediaType JSONTYPE = MediaType.parse("application/json; charset=utf-8");
-
 
     @Inject
     private OkHttpClient okHttpClient;
@@ -64,10 +60,10 @@ public class ImplingFinderWebManager {
             Request r;
             if (id == -1) {
                 r = new Request.Builder()
-                        .url(implingGetAnyEndpoint)
+                        .url(plugin.getImplingGetAnyEndpoint())
                         .build();
             } else {
-                String endpoint = implingGetIdEndpoint;
+                String endpoint = plugin.getImplingGetIdEndpoint();
                 endpoint += Integer.toString(id);
                 r = new Request.Builder()
                         .url(endpoint)
@@ -107,13 +103,14 @@ public class ImplingFinderWebManager {
 
     protected void postImplings() {
         try {
+            logger.error("Post Malone");
             List<Object> is = new ArrayList<>();
             is.addAll(plugin.getImplingsToUpload());
 
             // Oracle cloud only handles 1 JSON object to be posted at a time
             for (Object o : is) {
                 Request r = new Request.Builder()
-                        .url(implingPostEndpoint)
+                        .url(plugin.getImplingPostEndpoint())
                         .addHeader(CONTENT, JSON)
                         .post(RequestBody.create(JSONTYPE, gson.toJson(o)))
                         .build();
@@ -128,6 +125,7 @@ public class ImplingFinderWebManager {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (response.isSuccessful()) {
+                            logger.error(response.body().string());
                             response.close();
                         } else {
                             logger.error("On response error" + response.body().string());

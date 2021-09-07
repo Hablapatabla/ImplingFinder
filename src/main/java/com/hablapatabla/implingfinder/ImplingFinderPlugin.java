@@ -14,7 +14,9 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.task.Schedule;
@@ -22,6 +24,9 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.worlds.World;
+import net.runelite.http.api.worlds.WorldResult;
+import net.runelite.http.api.worlds.WorldType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +73,9 @@ public class ImplingFinderPlugin extends Plugin {
     @Inject
     private ImplingFinderWebManager webManager;
 
+    @Inject
+    private WorldService worldService;
+
     @Getter(AccessLevel.PACKAGE)
     private NavigationButton button = null;
 
@@ -77,6 +85,12 @@ public class ImplingFinderPlugin extends Plugin {
     @Setter(AccessLevel.PACKAGE)
     private ArrayList<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
 
+    @Getter
+    protected static String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+    @Getter
+    protected static String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings/";
+    @Getter
+    protected static String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
 
     @Provides
     ImplingFinderConfig provideConfig(ConfigManager configManager) {
@@ -88,6 +102,7 @@ public class ImplingFinderPlugin extends Plugin {
     private BufferedImage mapArrow;
 
     private boolean mapPointSet = false;
+    private boolean displayingButton = true;
     private long lastGetCall = System.currentTimeMillis();
 
     protected static final String CONFIG_GROUP = "Impling Finder";
@@ -98,6 +113,8 @@ public class ImplingFinderPlugin extends Plugin {
     protected void startUp() throws Exception {
         logger = LoggerFactory.getLogger(ImplingFinderPlugin.class);
         loadPluginPanel();
+        if (!config.beenOpened())
+            panel.showSplash();
     }
 
     @Override
@@ -119,8 +136,29 @@ public class ImplingFinderPlugin extends Plugin {
 
         panel = injector.getInstance(ImplingFinderPanel.class);
 
-        button = NavigationButton.builder().tooltip("Impling Finder").icon(icon).priority(1).panel(panel).build();
-        clientToolbar.addNavigation(button);
+        button = NavigationButton.builder().tooltip("Impling Finder").icon(icon).priority(6).panel(panel).build();
+        if (displayingButton)
+            clientToolbar.addNavigation(button);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (event.getGroup().equals(CONFIG_GROUP)) {
+            switch (event.getKey()) {
+                case ImplingFinderConfig.HIDE_BUTTON:
+                    if (config.hideButton())
+                        clientToolbar.removeNavigation(button);
+                    else
+                        clientToolbar.addNavigation(button);
+                    break;
+                case ImplingFinderConfig.POST_ENDPOINT_KEYNAME:
+                    implingPostEndpoint = config.shootingStarPostEndpointConfig();
+                    break;
+                case ImplingFinderConfig.GET_ENDPOINT_KEYNAME:
+                    implingGetAnyEndpoint = config.shootingStarGetEndpointConfig();
+                    break;
+            }
+        }
     }
 
     @Subscribe
@@ -153,8 +191,10 @@ public class ImplingFinderPlugin extends Plugin {
         int world = client.getWorld();
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
-        return new ImplingFinderData(n.getId(), n.getIndex(), world, point.getX(), point.getY(), point.getPlane(),
+        ImplingFinderData datum = new ImplingFinderData(n.getId(), n.getIndex(), world, point.getX(), point.getY(), point.getPlane(),
                 ZonedDateTime.now(ZoneId.of("UTC")).toString());
+        //logger.error("Making Imp:" + n.getName() + " " + datum.toString());
+        return datum;
     }
 
     public BufferedImage getClueScrollImage() {
