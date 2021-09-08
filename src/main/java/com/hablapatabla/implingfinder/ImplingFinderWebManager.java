@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
@@ -38,14 +37,13 @@ public class ImplingFinderWebManager {
 
     protected void getData(Integer id) {
         try {
-            //logger.error("GET DATA");
             Request r;
             if (id == -1) {
                 r = new Request.Builder()
-                        .url(plugin.getImplingGetAnyEndpoint())
+                        .url(ImplingFinderPlugin.implingGetAnyEndpoint)
                         .build();
             } else {
-                String endpoint = plugin.getImplingGetIdEndpoint();
+                String endpoint = ImplingFinderPlugin.implingGetIdEndpoint;
                 endpoint += Integer.toString(id);
                 r = new Request.Builder()
                         .url(endpoint)
@@ -64,8 +62,7 @@ public class ImplingFinderWebManager {
                         if (response.isSuccessful()) {
                             String responseBody = response.body().string();
                             ImplingsWrapper w = getGson().fromJson(responseBody, ImplingsWrapper.class);
-                            ArrayList<ImplingFinderData> ifd = new ArrayList<>(w.implings);
-                            plugin.setRemotelyFetchedImplings(ifd);
+                            plugin.setRemotelyFetchedImplings(w.implings);
                             plugin.updatePanels();
                         }
                     }
@@ -85,14 +82,11 @@ public class ImplingFinderWebManager {
 
     protected void postImplings() {
         try {
-            logger.error("Post Malone");
-            List<Object> is = new ArrayList<>();
-            is.addAll(plugin.getImplingsToUpload());
-
+            logger.error("HTTP POST Malone");
             // Oracle cloud only handles 1 JSON object to be posted at a time
             for (ImplingFinderData data : plugin.getImplingsToUpload()) {
                 Request r = new Request.Builder()
-                        .url(plugin.getImplingPostEndpoint())
+                        .url(ImplingFinderPlugin.implingPostEndpoint)
                         .addHeader(CONTENT, JSON)
                         .post(RequestBody.create(JSONTYPE, getGson().toJson(data)))
                         .build();

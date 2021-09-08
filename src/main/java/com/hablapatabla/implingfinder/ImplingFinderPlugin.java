@@ -77,16 +77,15 @@ public class ImplingFinderPlugin extends Plugin {
     private NavigationButton button = null;
 
     @Getter(AccessLevel.PACKAGE)
-    private ArrayList<ImplingFinderData> implingsToUpload = new ArrayList<>();
+    private List<ImplingFinderData> implingsToUpload = new ArrayList<>();
 
     @Setter(AccessLevel.PACKAGE)
-    private ArrayList<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
+    private List<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
 
-    @Getter
     protected static String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
-    @Getter
-    protected static String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings/";
-    @Getter
+
+    protected static String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev/";
+
     protected static String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
 
     @Provides
@@ -161,7 +160,6 @@ public class ImplingFinderPlugin extends Plugin {
     @Subscribe
     public void onNpcSpawned(NpcSpawned npcSpawned) {
         final NPC npc = npcSpawned.getNpc();
-
         if (npc.getName() == null)
             return;
 
@@ -180,7 +178,7 @@ public class ImplingFinderPlugin extends Plugin {
         int world = client.getWorld();
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
-        ImplingFinderData datum = ImplingFinderData.builder()
+        return ImplingFinderData.builder()
                                     .npcid(n.getId())
                                     .world(world)
                                     .xcoord(point.getX())
@@ -189,7 +187,6 @@ public class ImplingFinderPlugin extends Plugin {
                                     .discoveredtime(Instant.now())
                                     .build();
         //logger.error("Making Imp:" + n.getName() + " " + datum.toString());
-        return datum;
     }
 
     public BufferedImage getWorldMapImage() {
