@@ -79,19 +79,20 @@ public class ImplingFinderWebManager {
 
                 @Override
                 public void onResponse(Call call, Response response) {
-                    if (response.isSuccessful()) {
-                        try {
+                    try {
+                        if (response.isSuccessful()) {
                             String responseBody = response.body().string();
                             JsonObject j = new Gson().fromJson(responseBody, JsonObject.class);
                             plugin.setRemotelyFetchedImplings(parseData(j));
-                            response.close();
                             plugin.updatePanels();
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-
-                    } else {
-                        logger.error("GET responsed unsuccessful");
+                    }
+                    catch (Exception e) {
+                        logger.error("GET responded unsuccessful");
+                        logger.error(e.toString());
+                    }
+                    finally {
+                        response.close();
                     }
                 }
             });
@@ -124,11 +125,16 @@ public class ImplingFinderWebManager {
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            logger.error(response.body().string());
+                        try {
+                            if (!response.isSuccessful())
+                                logger.error("On post response error" + response.body().string());
+                        }
+                        catch (Exception e) {
+                            logger.error("");
+                            logger.error("POST responded unsuccessful  " + e.toString());
+                        }
+                        finally {
                             response.close();
-                        } else {
-                            logger.error("On response error" + response.body().string());
                         }
                     }
                 });
