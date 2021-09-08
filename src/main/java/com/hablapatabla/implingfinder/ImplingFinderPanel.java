@@ -103,17 +103,17 @@ public class ImplingFinderPanel extends PluginPanel {
         fetchPanel.setLayout(new BorderLayout());
         fetchPanel.setBorder(new EmptyBorder(0, 10, 5, 0));
 
-        JComboBox cbox = new JComboBox(TargetableImplings);
-        cbox.setSelectedIndex(0);
-        cbox.setForeground(Color.WHITE);
-        fetchPanel.add(cbox, BorderLayout.WEST);
+        JComboBox implingSelectionDropDown = new JComboBox(TargetableImplings);
+        implingSelectionDropDown.setSelectedIndex(0);
+        implingSelectionDropDown.setForeground(Color.WHITE);
+        fetchPanel.add(implingSelectionDropDown, BorderLayout.WEST);
 
         JButton fetchButton = new JButton("Fetch");
         fetchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 fetchRequested = true;
-                String requestedImpling = (String)cbox.getSelectedItem();
+                String requestedImpling = (String)implingSelectionDropDown.getSelectedItem();
                 Integer id = ImplingFinderEnum.getIdByShortenedName(requestedImpling).getNpcId();
                 if (id != null)
                     requestedId = id;
@@ -149,11 +149,10 @@ public class ImplingFinderPanel extends PluginPanel {
         splashWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
         splashPanel.setContent("Welcome to Impling Finder!",
                 " This plugin watches for implings around you, and uploads the locations of implings of Ninja quality" +
-                        " or higher to an external server. You may have had Runelite ask your for your IP, don't worry," +
-                        " this is just used to upload implings to the server. Uploads" +
-                        " are only done when implings are actually found, so this plugin has virtually 0 network usage. Please" +
-                        " raise an issue in the github repo if you find one, or would like to request a feature! This plugin" +
-                        " crowdsources data, so the more people using, the better. Tell your friends to install!" +
+                        " or higher to an external server. Uploads are only done when implings are actually found, so this plugin" +
+                        " has virtually 0 network usage. Please raise an issue in the github repo if you find one, or would like to request a feature!" +
+                        " This plugin crowdsources data, so the more people using it, the better. Tell your friends to install!" +
+                        " Try clicking on a found impling to see its precise location on your worldmap." +
                         "\nMake sure to go to the config and check \'Splash Seen\' so that you don't see this splash page again.\n\n");
         splashWrapper.add(splashPanel, BorderLayout.NORTH);
 

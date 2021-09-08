@@ -18,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -135,8 +134,10 @@ class ImplingFinderImpPanel extends JPanel {
         long daysBetween = ChronoUnit.DAYS.between(dt, ZonedDateTime.now(ZoneId.of("UTC")));
         if (daysBetween == 0)
             day = "Today";
+        else if (daysBetween == 1)
+            day = "Yesterday";
         else
-            day = Long.toString(daysBetween) + " day(s) ago";
+            day = Long.toString(daysBetween) + " days ago";
 
         middleRightTextLabel.setText(day);
         middleTextPanel.add(middleRightTextLabel, BorderLayout.EAST);

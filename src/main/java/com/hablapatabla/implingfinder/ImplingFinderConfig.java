@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.plugins.gpu.config.ColorBlindMode;
 
 @ConfigGroup(ImplingFinderPlugin.CONFIG_GROUP)
 public interface ImplingFinderConfig extends Config
@@ -19,7 +20,7 @@ public interface ImplingFinderConfig extends Config
             name = "POST endpoint",
             description = "Web endpoint to post star data to"
     )
-    default String shootingStarPostEndpointConfig()
+    default String implingFinderPostEndpointConfig()
     {
         return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
     }
@@ -30,7 +31,7 @@ public interface ImplingFinderConfig extends Config
             name = "GET endpoint",
             description = "Web endpoint to get star data from, only \"Any\" option will work"
     )
-    default String shootingStarGetEndpointConfig()
+    default String implingFinderGetEndpointConfig()
     {
         return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
     }
@@ -38,7 +39,7 @@ public interface ImplingFinderConfig extends Config
     @ConfigItem(
             position = 2,
             keyName = "showImpType",
-            name = "Cool Kid",
+            name = "I'm a cool Kid",
             description = "Only cool kids leave this checked"
     )
     default boolean showImpType() {
@@ -55,11 +56,14 @@ public interface ImplingFinderConfig extends Config
 
     @ConfigItem(
             position = 4,
-            keyName = "leaveThisOneChecked",
-            name = "Leave This One Checked",
-            description = "Don't uncheck it"
+            keyName = "uninstallMessage",
+            name = "Secret message!",
+            description = "There's a secret message in this dropdown"
     )
-    default boolean leaveThisOneChecked() { return true; }
+    default ImplingFinderConfigMessage colorBlindMode()
+    {
+        return ImplingFinderConfigMessage.PLEASE;
+    }
 
     @ConfigItem(
             position = 5,

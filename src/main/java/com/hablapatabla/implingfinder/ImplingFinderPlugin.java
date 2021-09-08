@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -24,9 +23,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
-import net.runelite.http.api.worlds.World;
-import net.runelite.http.api.worlds.WorldResult;
-import net.runelite.http.api.worlds.WorldType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +36,7 @@ import java.util.*;
 
 @Slf4j
 @PluginDescriptor(
-        name = "implingfinder",
+        name = "Impling Finder",
         description = "A plugin to crowdsource impling locations",
         tags = {"config", "menu", "impling", "finder", "hunter", "group",
                     "fun", "crowdsource", "crowd", "party", "implingfinder", "impling finder",
@@ -152,10 +148,10 @@ public class ImplingFinderPlugin extends Plugin {
                         clientToolbar.addNavigation(button);
                     break;
                 case ImplingFinderConfig.POST_ENDPOINT_KEYNAME:
-                    implingPostEndpoint = config.shootingStarPostEndpointConfig();
+                    implingPostEndpoint = config.implingFinderPostEndpointConfig();
                     break;
                 case ImplingFinderConfig.GET_ENDPOINT_KEYNAME:
-                    implingGetAnyEndpoint = config.shootingStarGetEndpointConfig();
+                    implingGetAnyEndpoint = config.implingFinderGetEndpointConfig();
                     break;
             }
         }
