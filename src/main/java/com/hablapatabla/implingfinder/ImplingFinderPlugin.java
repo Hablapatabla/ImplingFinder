@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -76,17 +77,16 @@ public class ImplingFinderPlugin extends Plugin {
     private NavigationButton button = null;
 
     @Getter(AccessLevel.PACKAGE)
-    private ArrayList<ImplingFinderData> implingsToUpload = new ArrayList<>();
+    private List<ImplingFinderData> implingsToUpload = new ArrayList<>();
 
     @Setter(AccessLevel.PACKAGE)
-    private ArrayList<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
+    private List<ImplingFinderData> remotelyFetchedImplings = new ArrayList<>();
 
-    @Getter
-    protected static String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
-    @Getter
-    protected static String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings/";
-    @Getter
-    protected static String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+    protected static String implingGetAnyEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
+
+    protected static String implingGetIdEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev/";
+
+    protected static String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
 
     @Provides
     ImplingFinderConfig provideConfig(ConfigManager configManager) {
@@ -160,11 +160,7 @@ public class ImplingFinderPlugin extends Plugin {
     @Subscribe
     public void onNpcSpawned(NpcSpawned npcSpawned) {
         final NPC npc = npcSpawned.getNpc();
-
         if (npc.getName() == null)
-            return;
-
-        if (npcAlreadyInList(npc.getIndex()))
             return;
 
         if (!isImpling(npc.getId()))
@@ -172,11 +168,6 @@ public class ImplingFinderPlugin extends Plugin {
 
         ImplingFinderData imp = makeImp(npc);
         implingsToUpload.add(imp);
-    }
-
-    private boolean npcAlreadyInList(int index) {
-        return remotelyFetchedImplings.stream().anyMatch(npc -> npc.getNpcindex() == index) ||
-                implingsToUpload.stream().anyMatch(npc -> npc.getNpcindex() == index);
     }
 
     private boolean isImpling(int id) {
@@ -187,10 +178,15 @@ public class ImplingFinderPlugin extends Plugin {
         int world = client.getWorld();
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
-        ImplingFinderData datum = new ImplingFinderData(n.getId(), n.getIndex(), world, point.getX(), point.getY(), point.getPlane(),
-                ZonedDateTime.now(ZoneId.of("UTC")).toString());
+        return ImplingFinderData.builder()
+                                    .npcid(n.getId())
+                                    .world(world)
+                                    .xcoord(point.getX())
+                                    .ycoord(point.getY())
+                                    .plane(point.getPlane())
+                                    .discoveredtime(Instant.now())
+                                    .build();
         //logger.error("Making Imp:" + n.getName() + " " + datum.toString());
-        return datum;
     }
 
     public BufferedImage getWorldMapImage() {
@@ -247,7 +243,7 @@ public class ImplingFinderPlugin extends Plugin {
     }
 
     public void updatePanels() {
-        Collections.sort(remotelyFetchedImplings);
+        Collections.sort(remotelyFetchedImplings, Collections.reverseOrder());
         SwingUtilities.invokeLater(() -> panel.populateNpcs(remotelyFetchedImplings));
     }
 }

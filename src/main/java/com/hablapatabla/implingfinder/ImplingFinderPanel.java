@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImplingFinderPanel extends PluginPanel {
     private static final String RESULTS_PANEL = "RESULTS_PANEL";
@@ -103,7 +104,7 @@ public class ImplingFinderPanel extends PluginPanel {
         fetchPanel.setLayout(new BorderLayout());
         fetchPanel.setBorder(new EmptyBorder(0, 10, 5, 0));
 
-        JComboBox implingSelectionDropDown = new JComboBox(TargetableImplings);
+        JComboBox<String> implingSelectionDropDown = new JComboBox<>(TargetableImplings);
         implingSelectionDropDown.setSelectedIndex(0);
         implingSelectionDropDown.setForeground(Color.WHITE);
         fetchPanel.add(implingSelectionDropDown, BorderLayout.WEST);
@@ -153,7 +154,7 @@ public class ImplingFinderPanel extends PluginPanel {
                         " has virtually 0 network usage. Please raise an issue in the github repo if you find one, or would like to request a feature!" +
                         " This plugin crowdsources data, so the more people using it, the better. Tell your friends to install!" +
                         " Try clicking on a found impling to see its precise location on your worldmap." +
-                        "\nMake sure to go to the config and check \'Splash Seen\' so that you don't see this splash page again.\n\n");
+                        "\nMake sure to go to the config and check 'Splash Seen' so that you don't see this splash page again.\n\n");
         splashWrapper.add(splashPanel, BorderLayout.NORTH);
 
         JButton getStartedButton = new JButton("Let's get started");
@@ -182,7 +183,7 @@ public class ImplingFinderPanel extends PluginPanel {
         cardLayout.show(container, ERROR_PANEL);
     }
 
-    public void populateNpcs(ArrayList<ImplingFinderData> npcs) {
+    public void populateNpcs(List<ImplingFinderData> npcs) {
         c.gridy = 0;
         c.weighty = 0;
 
@@ -194,7 +195,7 @@ public class ImplingFinderPanel extends PluginPanel {
         }
         cardLayout.show(container, RESULTS_PANEL);
 
-        ArrayList<JPanel> implings = new ArrayList<>();
+        List<JPanel> implings = new ArrayList<>();
         int defaultThumbnailId = ItemID.BABY_MOLERAT;
         for (ImplingFinderData npc : npcs) {
             JPanel marginWrapper = new JPanel(new BorderLayout());

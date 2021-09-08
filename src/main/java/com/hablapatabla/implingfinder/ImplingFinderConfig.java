@@ -9,10 +9,10 @@ import net.runelite.client.plugins.gpu.config.ColorBlindMode;
 @ConfigGroup(ImplingFinderPlugin.CONFIG_GROUP)
 public interface ImplingFinderConfig extends Config
 {
-    public String HIDE_BUTTON = "hideButton";
-    public String POST_ENDPOINT_KEYNAME = "post endpoint";
-    public String GET_ENDPOINT_KEYNAME = "get endpoint";
-    public String SPLASH_SEEN = "splashSeen";
+    String HIDE_BUTTON = "hideButton";
+    String POST_ENDPOINT_KEYNAME = "post endpoint";
+    String GET_ENDPOINT_KEYNAME = "get endpoint";
+    String SPLASH_SEEN = "splashSeen";
 
     @ConfigItem(
             keyName = POST_ENDPOINT_KEYNAME,
@@ -22,7 +22,7 @@ public interface ImplingFinderConfig extends Config
     )
     default String implingFinderPostEndpointConfig()
     {
-        return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+        return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
     }
 
     @ConfigItem(
@@ -33,7 +33,7 @@ public interface ImplingFinderConfig extends Config
     )
     default String implingFinderGetEndpointConfig()
     {
-        return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/imp/implings";
+        return "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
     }
 
     @ConfigItem(

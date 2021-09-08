@@ -1,9 +1,8 @@
 package com.hablapatabla.implingfinder;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.annotations.SerializedName;
+import lombok.Value;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.List;
 
 @Singleton
@@ -24,46 +24,26 @@ public class ImplingFinderWebManager {
     private OkHttpClient okHttpClient;
 
     @Inject
-    private Gson gson;
+    private ImplingFinderPlugin plugin;
 
     @Inject
-    private ImplingFinderPlugin plugin;
+    private GsonBuilder gsonBuilder;
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderWebManager.class);
 
-    private ArrayList<ImplingFinderData> parseData(JsonArray j) {
-        ArrayList<ImplingFinderData> l = new ArrayList<>();
-        if (j.size() == 0) {
-            return l;
-        }
-
-        JsonElement je = j.get(0);
-        for (JsonElement jsonElement : j) {
-            JsonObject jObj = jsonElement.getAsJsonObject();
-            ImplingFinderData d = new ImplingFinderData(jObj.get("npcid").getAsInt(),
-                    jObj.get("npcindex").getAsInt(), jObj.get("world").getAsInt(), jObj.get("xcoord").getAsInt(),
-                    jObj.get("ycoord").getAsInt(), jObj.get("plane").getAsInt(), jObj.get("discoveredtime").getAsString());
-            l.add(d);
-        }
-        return l;
+    private Gson getGson() {
+        return gsonBuilder.registerTypeAdapter(Instant.class, new InstantSecondsConverter()).create();
     }
-
-    private ArrayList<ImplingFinderData> parseData(JsonObject o) {
-        JsonArray arr = o.get("items").getAsJsonArray();
-        return parseData(arr);
-    }
-
 
     protected void getData(Integer id) {
         try {
-            //logger.error("GET DATA");
             Request r;
             if (id == -1) {
                 r = new Request.Builder()
-                        .url(plugin.getImplingGetAnyEndpoint())
+                        .url(ImplingFinderPlugin.implingGetAnyEndpoint)
                         .build();
             } else {
-                String endpoint = plugin.getImplingGetIdEndpoint();
+                String endpoint = ImplingFinderPlugin.implingGetIdEndpoint;
                 endpoint += Integer.toString(id);
                 r = new Request.Builder()
                         .url(endpoint)
@@ -73,23 +53,21 @@ public class ImplingFinderWebManager {
             okHttpClient.newCall(r).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    logger.error("Get failed");
-                    logger.error(e.toString());
+                    logger.error("Get failed " + e.toString());
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) {
+                public void onResponse(Call call, Response response) throws IOException {
                     try {
                         if (response.isSuccessful()) {
                             String responseBody = response.body().string();
-                            JsonObject j = new Gson().fromJson(responseBody, JsonObject.class);
-                            plugin.setRemotelyFetchedImplings(parseData(j));
+                            ImplingsWrapper w = getGson().fromJson(responseBody, ImplingsWrapper.class);
+                            plugin.setRemotelyFetchedImplings(w.implings);
                             plugin.updatePanels();
                         }
                     }
                     catch (Exception e) {
-                        logger.error("GET responded unsuccessful");
-                        logger.error(e.toString());
+                        logger.error("GET unsuccessful" + e.toString());
                     }
                     finally {
                         response.close();
@@ -98,24 +76,20 @@ public class ImplingFinderWebManager {
             });
         }
         catch (Exception e) {
-            logger.error(e.toString());
+            logger.error("Outer catch block GET " + e.toString());
         }
     }
 
     protected void postImplings() {
         try {
-            logger.error("Post Malone");
-            List<Object> is = new ArrayList<>();
-            is.addAll(plugin.getImplingsToUpload());
-
+            logger.error("HTTP POST Malone");
             // Oracle cloud only handles 1 JSON object to be posted at a time
-            for (Object o : is) {
+            for (ImplingFinderData data : plugin.getImplingsToUpload()) {
                 Request r = new Request.Builder()
-                        .url(plugin.getImplingPostEndpoint())
+                        .url(ImplingFinderPlugin.implingPostEndpoint)
                         .addHeader(CONTENT, JSON)
-                        .post(RequestBody.create(JSONTYPE, gson.toJson(o)))
+                        .post(RequestBody.create(JSONTYPE, getGson().toJson(data)))
                         .build();
-
                 okHttpClient.newCall(r).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -130,7 +104,6 @@ public class ImplingFinderWebManager {
                                 logger.error("On post response error" + response.body().string());
                         }
                         catch (Exception e) {
-                            logger.error("");
                             logger.error("POST responded unsuccessful  " + e.toString());
                         }
                         finally {
@@ -140,8 +113,31 @@ public class ImplingFinderWebManager {
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Outer catch block POST " + e.toString());
         }
         plugin.getImplingsToUpload().clear();
+    }
+
+    @Value
+    private static class ImplingsWrapper {
+        @SerializedName("items")
+        List<ImplingFinderData> implings;
+    }
+
+    /**
+     * Serializes/Unserializes {@link Instant} using {@link Instant#getEpochSecond()}/{@link Instant#ofEpochSecond(long)}
+     */
+    private static class InstantSecondsConverter implements JsonSerializer<Instant>, JsonDeserializer<Instant>
+    {
+        @Override
+        public JsonElement serialize(Instant src, Type srcType, JsonSerializationContext context) {
+            return new JsonPrimitive(src.getEpochSecond());
+        }
+
+        @Override
+        public Instant deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+                throws JsonParseException {
+            return Instant.ofEpochSecond(json.getAsLong());
+        }
     }
 }

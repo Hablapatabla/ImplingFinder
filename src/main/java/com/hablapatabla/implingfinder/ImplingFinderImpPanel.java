@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -130,8 +131,7 @@ class ImplingFinderImpPanel extends JPanel {
         JLabel middleRightTextLabel = new JLabel();
         middleRightTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
         String day;
-        ZonedDateTime dt = ZonedDateTime.parse(data.getDiscoveredtime());
-        long daysBetween = ChronoUnit.DAYS.between(dt, ZonedDateTime.now(ZoneId.of("UTC")));
+        long daysBetween = ChronoUnit.DAYS.between(data.getDiscoveredtime(), Instant.now());
         if (daysBetween == 0)
             day = "Today";
         else if (daysBetween == 1)
@@ -148,7 +148,7 @@ class ImplingFinderImpPanel extends JPanel {
         panels.add(bottomTextRowPanel);
 
         JLabel bottomLeftTextLabel = new JLabel();
-        String foundTime = dt.withZoneSameInstant(ZoneId.systemDefault())
+        String foundTime = data.getDiscoveredtime().atZone(ZoneId.systemDefault())
                         .format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG));
         bottomLeftTextLabel.setText(foundTime);
         bottomLeftTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
