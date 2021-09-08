@@ -7,6 +7,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.AsyncBufferedImage;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,12 +132,12 @@ class ImplingFinderImpPanel extends JPanel {
         middleRightTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
         String day;
         ZonedDateTime dt = ZonedDateTime.parse(data.getDiscoveredtime());
-        if (dt.toLocalDate().equals(LocalDate.now(dt.getZone())))
+        long daysBetween = ChronoUnit.DAYS.between(dt, ZonedDateTime.now(ZoneId.of("UTC")));
+        if (daysBetween == 0)
             day = "Today";
-        else {
-            long daysBetween = ChronoUnit.DAYS.between(dt, ZonedDateTime.now(ZoneId.of("UTC")));
+        else
             day = Long.toString(daysBetween) + " day(s) ago";
-        }
+
         middleRightTextLabel.setText(day);
         middleTextPanel.add(middleRightTextLabel, BorderLayout.EAST);
         rightPanel.add(middleTextPanel);
@@ -146,9 +147,9 @@ class ImplingFinderImpPanel extends JPanel {
         panels.add(bottomTextRowPanel);
 
         JLabel bottomLeftTextLabel = new JLabel();
-        String aaa = dt.withZoneSameInstant(ZoneId.systemDefault())
+        String foundTime = dt.withZoneSameInstant(ZoneId.systemDefault())
                         .format(DateTimeFormatter.ofLocalizedTime(FormatStyle.LONG));
-        bottomLeftTextLabel.setText(aaa);
+        bottomLeftTextLabel.setText(foundTime);
         bottomLeftTextLabel.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
         bottomTextRowPanel.add(bottomLeftTextLabel, BorderLayout.WEST);
 
@@ -158,6 +159,7 @@ class ImplingFinderImpPanel extends JPanel {
             location = ImplingFinderRegion.fromRegion(playerRegionId).getName();
         else
             location = "Unknown";
+        location = StringUtils.abbreviate(location, 12);
 
         JLabel bottomRightTextLabel = new JLabel();
         bottomRightTextLabel.setText(location);

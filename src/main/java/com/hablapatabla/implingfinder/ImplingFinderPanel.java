@@ -23,7 +23,7 @@ public class ImplingFinderPanel extends PluginPanel {
     private static final String RESULTS_PANEL = "RESULTS_PANEL";
     private static final String ERROR_PANEL = "ERROR_PANEL";
     private static final String SPLASH_PANEL = "SPLASH_PANEL";
-    private static String[] TargetableImplings = {"Any", "Eclectic", "Magpie", "Ninja", "Crystal", "Dragon", "Lucky"};
+    private static String[] TargetableImplings = {"Any", "Magpie", "Ninja", "Crystal", "Dragon", "Lucky"};
 
     private GridBagConstraints c = new GridBagConstraints();
     private final CardLayout cardLayout = new CardLayout();

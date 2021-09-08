@@ -17,15 +17,16 @@ class ImplingFinderWorldMapPoint extends WorldMapPoint
     {
         super(worldPoint, null);
 
-        worldImage = new BufferedImage(plugin.getMapArrow().getWidth(), plugin.getMapArrow().getHeight(), BufferedImage.TYPE_INT_ARGB);
+        worldImage = new BufferedImage(plugin.getWorldMapImage().getWidth(), plugin.getWorldMapImage().getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = worldImage.getGraphics();
-        graphics.drawImage(plugin.getMapArrow(), 0, 0, null);
-        graphics.drawImage(plugin.getClueScrollImage(), 0, 0, null);
+        graphics.drawImage(plugin.getWorldMapImage(), 0, 0, null);
+        graphics.drawImage(plugin.getWorldMapImage(), 0, 0, null);
         worldImagePoint = new Point(
-                worldImage.getWidth() / 2,
+                worldImage.getWidth(),
                 worldImage.getHeight());
 
         this.plugin = plugin;
+        this.setName("Impling");
         this.setSnapToEdge(true);
         this.setJumpOnClick(true);
         this.setImage(worldImage);
@@ -34,7 +35,7 @@ class ImplingFinderWorldMapPoint extends WorldMapPoint
 
     @Override
     public void onEdgeSnap() {
-        this.setImage(plugin.getClueScrollImage());
+        this.setImage(plugin.getWorldMapImage());
         this.setImagePoint(null);
     }
 

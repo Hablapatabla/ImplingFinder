@@ -99,7 +99,7 @@ public class ImplingFinderPlugin extends Plugin {
 
     private Logger logger;
     private BufferedImage icon;
-    private BufferedImage mapArrow;
+    private BufferedImage mapArrow = null;
 
     private boolean mapPointSet = false;
     private boolean displayingButton = true;
@@ -197,16 +197,8 @@ public class ImplingFinderPlugin extends Plugin {
         return datum;
     }
 
-    public BufferedImage getClueScrollImage() {
-        return itemManager.getImage(ItemID.CLUE_SCROLL_MASTER);
-    }
-
-    public BufferedImage getMapArrow() {
-        if (mapArrow != null)
-            return mapArrow;
-
-        mapArrow = ImageUtil.loadImageResource(getClass(), "/util/clue_arrow.png");
-        return mapArrow;
+    public BufferedImage getWorldMapImage() {
+        return ImageUtil.loadImageResource(getClass(), "/icon.png");
     }
 
     public void addMapPoints(WorldPoint... points) {
@@ -223,10 +215,7 @@ public class ImplingFinderPlugin extends Plugin {
         mapPointSet = true;
         worldMapPointManager.removeIf(ImplingFinderWorldMapPoint.class::isInstance);
         for (final WorldPoint point : points)
-        {
-            System.out.println(point.toString());
             worldMapPointManager.add(new ImplingFinderWorldMapPoint(point, this));
-        }
     }
 
     @Schedule(

@@ -64,7 +64,7 @@ public interface ImplingFinderConfig extends Config
     @ConfigItem(
             position = 5,
             keyName = "splashSeen",
-            name = "Have seen the splash page",
+            name = "I've seen the splash page",
             description = "This plugin has been opened before"
     )
     default boolean beenOpened() { return false; }
