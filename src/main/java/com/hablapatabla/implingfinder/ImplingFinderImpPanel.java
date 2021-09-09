@@ -49,6 +49,10 @@ class ImplingFinderImpPanel extends JPanel {
         put(NpcID.CRYSTAL_IMPLING, ItemID.CRYSTAL_IMPLING_JAR);
         put(NpcID.DRAGON_IMPLING, ItemID.DRAGON_IMPLING_JAR);
         put(NpcID.LUCKY_IMPLING, ItemID.LUCKY_IMPLING_JAR);
+        put(NpcID.NINJA_IMPLING_1653, ItemID.NINJA_IMPLING_JAR);
+        put(NpcID.DRAGON_IMPLING_1654, ItemID.DRAGON_IMPLING_JAR);
+        put(NpcID.MAGPIE_IMPLING_1652, ItemID.MAGPIE_IMPLING_JAR);
+        put(NpcID.LUCKY_IMPLING_7302, ItemID.LUCKY_IMPLING_JAR);
     }};
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderImpPanel.class);
@@ -137,7 +141,7 @@ class ImplingFinderImpPanel extends JPanel {
         else if (daysBetween == 1)
             day = "Yesterday";
         else
-            day = Long.toString(daysBetween) + " days ago";
+            day = daysBetween + " days ago";
 
         middleRightTextLabel.setText(day);
         middleTextPanel.add(middleRightTextLabel, BorderLayout.EAST);
