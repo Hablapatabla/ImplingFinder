@@ -117,7 +117,7 @@ class ImplingFinderImpPanel extends JPanel {
         itemName.setForeground(Color.WHITE);
         itemName.setMaximumSize(new Dimension(0, 0));        // to limit the label's size for
         itemName.setPreferredSize(new Dimension(0, 0));    // items with longer names
-        itemName.setText(ImplingFinderEnum.findById(data.getNpcid()).getName() + " impling");
+        itemName.setText(ImplingFinderEnum.findById(data.getNpcid()).getName());
         rightPanel.add(itemName);
 
         JPanel middleTextPanel = new JPanel(new BorderLayout());

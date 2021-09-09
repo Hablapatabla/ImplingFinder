@@ -19,11 +19,11 @@ public enum ImplingFinderEnum {
     ESSENCE(1639, "Essence impling"),*/
     //ECLECTIC(1640, "Eclectic impling"),
     //NATURE(1641, "Nature impling"),
-    MAGPIE(1642, "Magpie"),
-    NINJA(1643, "Ninja"),
-    CRYSTAL(8741, "Crystal"),
-    DRAGON(1644, "Dragon"),
-    LUCKY(7233, "Lucky"),
+    MAGPIE(1642, "Magpie impling"),
+    NINJA(1643, "Ninja impling"),
+    CRYSTAL(8741, "Crystal impling"),
+    DRAGON(1644, "Dragon impling"),
+    LUCKY(7233, "Lucky impling"),
     ANY(-1, "Any");
 
     private int npcId;
