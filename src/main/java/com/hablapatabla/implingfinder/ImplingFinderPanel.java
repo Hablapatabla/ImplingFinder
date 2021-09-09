@@ -115,7 +115,7 @@ public class ImplingFinderPanel extends PluginPanel {
             public void actionPerformed(ActionEvent e) {
                 fetchRequested = true;
                 String requestedImpling = (String)implingSelectionDropDown.getSelectedItem();
-                Integer id = ImplingFinderEnum.getIdByShortenedName(requestedImpling).getNpcId();
+                Integer id = ImplingFinderEnum.getIdByShortenedName(requestedImpling);
                 if (id != null)
                     requestedId = id;
                 else
@@ -149,7 +149,7 @@ public class ImplingFinderPanel extends PluginPanel {
         JPanel splashWrapper = new JPanel(new BorderLayout());
         splashWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
         splashPanel.setContent("Welcome to Impling Finder!",
-                " This plugin watches for implings around you, and uploads the locations of implings of Ninja quality" +
+                " This plugin watches for implings around you, and uploads the locations of implings of Magpie quality" +
                         " or higher to an external server. Uploads are only done when implings are actually found, so this plugin" +
                         " has virtually 0 network usage. Please raise an issue in the github repo if you find one, or would like to request a feature!" +
                         " This plugin crowdsources data, so the more people using it, the better. Tell your friends to install!" +

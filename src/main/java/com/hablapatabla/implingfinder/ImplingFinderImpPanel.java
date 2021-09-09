@@ -1,6 +1,7 @@
 package com.hablapatabla.implingfinder;
 
 import net.runelite.api.ItemID;
+import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.game.ItemManager;
@@ -49,10 +50,6 @@ class ImplingFinderImpPanel extends JPanel {
         put(NpcID.CRYSTAL_IMPLING, ItemID.CRYSTAL_IMPLING_JAR);
         put(NpcID.DRAGON_IMPLING, ItemID.DRAGON_IMPLING_JAR);
         put(NpcID.LUCKY_IMPLING, ItemID.LUCKY_IMPLING_JAR);
-        put(NpcID.NINJA_IMPLING_1653, ItemID.NINJA_IMPLING_JAR);
-        put(NpcID.DRAGON_IMPLING_1654, ItemID.DRAGON_IMPLING_JAR);
-        put(NpcID.MAGPIE_IMPLING_1652, ItemID.MAGPIE_IMPLING_JAR);
-        put(NpcID.LUCKY_IMPLING_7302, ItemID.LUCKY_IMPLING_JAR);
     }};
 
     private Logger logger = LoggerFactory.getLogger(ImplingFinderImpPanel.class);
@@ -69,6 +66,7 @@ class ImplingFinderImpPanel extends JPanel {
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         panels.add(this);
         setBorder(new EmptyBorder(7, 0, 0, 0));
+
 
         WorldPoint implingWorldPoint = new WorldPoint(data.getXcoord(), data.getYcoord(), data.getPlane());
 
@@ -119,7 +117,7 @@ class ImplingFinderImpPanel extends JPanel {
         itemName.setForeground(Color.WHITE);
         itemName.setMaximumSize(new Dimension(0, 0));        // to limit the label's size for
         itemName.setPreferredSize(new Dimension(0, 0));    // items with longer names
-        itemName.setText(ImplingFinderEnum.findById(data.getNpcid()).getName());
+        itemName.setText(ImplingFinderEnum.findById(data.getNpcid()).getName() + " impling");
         rightPanel.add(itemName);
 
         JPanel middleTextPanel = new JPanel(new BorderLayout());

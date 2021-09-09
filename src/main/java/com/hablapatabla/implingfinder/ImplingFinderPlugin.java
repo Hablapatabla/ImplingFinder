@@ -163,11 +163,16 @@ public class ImplingFinderPlugin extends Plugin {
         if (npc.getName() == null)
             return;
 
-        if (!isImpling(npc.getId()))
+        if (!isImpling(npc.getName()))
             return;
 
         ImplingFinderData imp = makeImp(npc);
+        logger.error(imp.toString());
         implingsToUpload.add(imp);
+    }
+
+    private boolean isImpling(String name) {
+        return ImplingFinderEnum.getIdByShortenedName(name) != -1;
     }
 
     private boolean isImpling(int id) {
@@ -179,7 +184,7 @@ public class ImplingFinderPlugin extends Plugin {
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
         return ImplingFinderData.builder()
-                                    .npcid(n.getId())
+                                    .npcid(ImplingFinderEnum.getIdByShortenedName(n.getName()))
                                     .world(world)
                                     .xcoord(point.getX())
                                     .ycoord(point.getY())
