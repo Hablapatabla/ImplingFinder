@@ -2,6 +2,10 @@ package com.hablapatabla.implingfinder;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
+import com.hablapatabla.implingfinder.model.ImplingFinderData;
+import com.hablapatabla.implingfinder.model.ImplingFinderEnum;
+import com.hablapatabla.implingfinder.model.ImplingFinderWorldMapPoint;
+import com.hablapatabla.implingfinder.ui.ImplingFinderPanel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,8 +34,6 @@ import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -41,7 +43,7 @@ import java.util.*;
         description = "A plugin to crowdsource impling locations",
         tags = {"config", "menu", "impling", "finder", "hunter", "group",
                     "fun", "crowdsource", "crowd", "party", "implingfinder", "impling finder",
-                    "clue", "clue scroll", "medium clue",},
+                    "clue", "clue scroll", "medium clue", "Impling Finder", "Impling", "Finder"},
         loadWhenOutdated = true,
         enabledByDefault = true
 )
@@ -172,7 +174,7 @@ public class ImplingFinderPlugin extends Plugin {
     }
 
     private boolean isImpling(String name) {
-        return ImplingFinderEnum.getIdByShortenedName(name) != -1;
+        return ImplingFinderEnum.getIdByNameStrict(name) != -1;
     }
 
     private boolean isImpling(int id) {
@@ -184,7 +186,7 @@ public class ImplingFinderPlugin extends Plugin {
         WorldArea area = n.getWorldArea();
         WorldPoint point = area.toWorldPoint();
         return ImplingFinderData.builder()
-                                    .npcid(ImplingFinderEnum.getIdByShortenedName(n.getName()))
+                                    .npcid(ImplingFinderEnum.getIdByNameStrict(n.getName()))
                                     .world(world)
                                     .xcoord(point.getX())
                                     .ycoord(point.getY())

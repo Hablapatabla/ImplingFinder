@@ -2,6 +2,7 @@ package com.hablapatabla.implingfinder;
 
 import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
+import com.hablapatabla.implingfinder.model.ImplingFinderData;
 import lombok.Value;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -48,12 +49,13 @@ public class ImplingFinderWebManager {
                 r = new Request.Builder()
                         .url(endpoint)
                         .build();
+                logger.error("ENDPOINT " + endpoint);
             }
 
             okHttpClient.newCall(r).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    logger.error("Get failed " + e.toString());
+                    logger.error("Get failed ", e);
                 }
 
                 @Override
@@ -61,13 +63,14 @@ public class ImplingFinderWebManager {
                     try {
                         if (response.isSuccessful()) {
                             String responseBody = response.body().string();
+                            logger.debug(responseBody);
                             ImplingsWrapper w = getGson().fromJson(responseBody, ImplingsWrapper.class);
                             plugin.setRemotelyFetchedImplings(w.implings);
                             plugin.updatePanels();
                         }
                     }
                     catch (Exception e) {
-                        logger.error("GET unsuccessful" + e.toString());
+                        logger.error("GET unsuccessful", e);
                     }
                     finally {
                         response.close();
@@ -76,7 +79,7 @@ public class ImplingFinderWebManager {
             });
         }
         catch (Exception e) {
-            logger.error("Outer catch block GET " + e.toString());
+            logger.error("Outer catch block GET ", e);
         }
     }
 
@@ -93,8 +96,7 @@ public class ImplingFinderWebManager {
                 okHttpClient.newCall(r).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        logger.error("Failed to post implings");
-                        logger.debug(e.toString());
+                        logger.error("Failed to post implings", e);
                     }
 
                     @Override
@@ -104,7 +106,7 @@ public class ImplingFinderWebManager {
                                 logger.error("On post response error" + response.body().string());
                         }
                         catch (Exception e) {
-                            logger.error("POST responded unsuccessful  " + e.toString());
+                            logger.error("POST responded unsuccessful  ", e);
                         }
                         finally {
                             response.close();
@@ -113,7 +115,7 @@ public class ImplingFinderWebManager {
                 });
             }
         } catch (Exception e) {
-            logger.error("Outer catch block POST " + e.toString());
+            logger.error("Outer catch block POST ", e);
         }
         plugin.getImplingsToUpload().clear();
     }

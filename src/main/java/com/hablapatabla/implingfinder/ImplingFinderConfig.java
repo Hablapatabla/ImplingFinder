@@ -1,10 +1,9 @@
 package com.hablapatabla.implingfinder;
 
-import lombok.Getter;
+import com.hablapatabla.implingfinder.model.ImplingFinderConfigMessage;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.plugins.gpu.config.ColorBlindMode;
 
 @ConfigGroup(ImplingFinderPlugin.CONFIG_GROUP)
 public interface ImplingFinderConfig extends Config
