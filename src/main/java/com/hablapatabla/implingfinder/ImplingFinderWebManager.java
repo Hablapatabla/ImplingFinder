@@ -127,7 +127,7 @@ public class ImplingFinderWebManager {
     }
 
     /**
-     * Serializes/Unserializes {@link Instant} using {@link Instant#getEpochSecond()}/{@link Instant#ofEpochSecond(long)}
+     * Serializes/Deserializes {@link Instant} using {@link Instant#getEpochSecond()}/{@link Instant#ofEpochSecond(long)}
      */
     private static class InstantSecondsConverter implements JsonSerializer<Instant>, JsonDeserializer<Instant>
     {
