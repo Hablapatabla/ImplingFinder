@@ -17,11 +17,63 @@ import javax.inject.Inject;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
+@SuppressWarnings("serial")
+class ImplingButton extends JButton {
+    private boolean selected = false;
+
+    ImplingButton() {
+        this(null);
+    }
+
+    ImplingButton(Image i) {
+        super.setContentAreaFilled(false);
+
+        this.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selected = !selected;
+            }
+        });
+
+        setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        setFocusPainted(false);
+        this.setRequestFocusEnabled(false);
+        //setBorderPainted(false);
+        this.setIcon(new ImageIcon(i));
+        setBorder(new EtchedBorder());
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        Color oldFg = getForeground();
+        Color newFg = oldFg;
+        ButtonModel mod = getModel();
+
+        if (mod.isPressed()) {
+            g.setColor(ColorScheme.DARK_GRAY_COLOR);
+        }
+        else if (mod.isRollover())
+            g.setColor(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+        else {
+            if (selected)
+                g.setColor(ColorScheme.DARKER_GRAY_COLOR);
+            else
+                g.setColor(ColorScheme.DARK_GRAY_COLOR);
+        }
+
+        g.fillRect(0, 0, getWidth(), getHeight());
+        setForeground(newFg);
+        super.paintComponent(g);
+        setForeground(oldFg);
+    }
+}
 
 public class ImplingFinderPanel extends PluginPanel {
     private static final String RESULTS_PANEL = "RESULTS_PANEL";
@@ -60,15 +112,15 @@ public class ImplingFinderPanel extends PluginPanel {
     @Getter
     private boolean splashRequested = false;
 
-    @Inject
     private ItemManager itemManager;
 
     @Inject
     private Client client;
 
     @Inject
-    protected ImplingFinderPanel(ImplingFinderPlugin plugin) {
+    protected ImplingFinderPanel(ImplingFinderPlugin plugin, ItemManager itemManager) {
         this.plugin = plugin;
+        this.itemManager = itemManager;
         implingFinderPanelHelper(plugin);
     }
 
@@ -122,7 +174,7 @@ public class ImplingFinderPanel extends PluginPanel {
         implingSelectionDropDown.setRequestFocusEnabled(false);
         implingSelectionDropDown.setSelectedIndex(0);
 
-        fetchPanel.add(implingSelectionDropDown, BorderLayout.WEST);
+        //fetchPanel.add(implingSelectionDropDown, BorderLayout.WEST);
 
         JButton fetchButton = new JButton("Fetch");
         fetchButton.addActionListener(new ActionListener() {
@@ -135,7 +187,28 @@ public class ImplingFinderPanel extends PluginPanel {
         });
         fetchButton.setForeground(Color.WHITE);
         fetchButton.setRequestFocusEnabled(false);
-        fetchPanel.add(fetchButton, BorderLayout.EAST);
+        fetchPanel.add(fetchButton, BorderLayout.SOUTH);
+
+        JPanel implingSelections = new JPanel(new GridLayout(2, 3));
+
+        List<ImplingButton> buttonList = new ArrayList<ImplingButton>();
+        for (String s : TargetableImplings) {
+            Image i;
+            int id = ImplingFinderEnum.getIdByNameFuzzy(s);
+            if (id == -1)
+                i = itemManager.getImage(ItemID.TEAK_CLOCK);
+            else {
+                int itemid = ImplingFinderImpPanel.getItemIdFromNpcId(id);
+                i = itemManager.getImage(itemid);
+            }
+            ImplingButton b = new ImplingButton(i);
+            buttonList.add(b);
+        }
+
+        for (JButton p : buttonList)
+            implingSelections.add(p);
+
+        fetchPanel.add(implingSelections, BorderLayout.NORTH);
 
         topContainer.add(titlePanel, BorderLayout.NORTH);
         topContainer.add(fetchPanel, BorderLayout.SOUTH);
@@ -185,6 +258,13 @@ public class ImplingFinderPanel extends PluginPanel {
         cardLayout.show(container, ERROR_PANEL);
 
         this.add(container, BorderLayout.CENTER);
+    }
+
+    private JButton makeImplingButtonPanel(String buttonLabel) {
+        JPanel p = new JPanel();
+        JButton b = new JButton(buttonLabel);
+        p.add(b);
+        return b;
     }
 
     public void showSplash() {

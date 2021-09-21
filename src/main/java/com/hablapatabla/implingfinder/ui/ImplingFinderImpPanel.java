@@ -11,6 +11,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.AsyncBufferedImage;
+import net.runelite.http.api.npc.NpcInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ class ImplingFinderImpPanel extends JPanel {
     private WorldMapPointManager worldMapPointManager;
 
     // npc id to ItemID
-    private Map<Integer, Integer> thumbnails = new HashMap<Integer, Integer>() {{
+    private static Map<Integer, Integer> thumbnails = new HashMap<Integer, Integer>() {{
         /*put(NpcID.BABY_IMPLING, ItemID.BABY_IMPLING_JAR);
         put(NpcID.YOUNG_IMPLING, ItemID.YOUNG_IMPLING_JAR);
         put(NpcID.GOURMET_IMPLING, ItemID.GOURMET_IMPLING_JAR);
@@ -58,6 +59,10 @@ class ImplingFinderImpPanel extends JPanel {
     private List<JPanel> panels = new ArrayList<>();
 
     protected ImplingFinderPlugin plugin;
+
+    public static int getItemIdFromNpcId(int id) {
+        return thumbnails.get(id);
+    }
 
     ImplingFinderImpPanel(ItemManager manager, ImplingFinderData data, Integer defaultId, ImplingFinderPlugin plugin) {
         Color background = getBackground();
