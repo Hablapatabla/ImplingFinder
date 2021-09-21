@@ -24,57 +24,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("serial")
-class ImplingButton extends JButton {
-    private boolean selected = false;
-
-    ImplingButton() {
-        this(null);
-    }
-
-    ImplingButton(Image i) {
-        super.setContentAreaFilled(false);
-
-        this.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                selected = !selected;
-            }
-        });
-
-        setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        setFocusPainted(false);
-        this.setRequestFocusEnabled(false);
-        //setBorderPainted(false);
-        this.setIcon(new ImageIcon(i));
-        setBorder(new EtchedBorder());
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        Color oldFg = getForeground();
-        Color newFg = oldFg;
-        ButtonModel mod = getModel();
-
-        if (mod.isPressed()) {
-            g.setColor(ColorScheme.DARK_GRAY_COLOR);
-        }
-        else if (mod.isRollover())
-            g.setColor(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-        else {
-            if (selected)
-                g.setColor(ColorScheme.DARKER_GRAY_COLOR);
-            else
-                g.setColor(ColorScheme.DARK_GRAY_COLOR);
-        }
-
-        g.fillRect(0, 0, getWidth(), getHeight());
-        setForeground(newFg);
-        super.paintComponent(g);
-        setForeground(oldFg);
-    }
-}
-
 public class ImplingFinderPanel extends PluginPanel {
     private static final String RESULTS_PANEL = "RESULTS_PANEL";
     private static final String ERROR_PANEL = "ERROR_PANEL";
@@ -201,7 +150,7 @@ public class ImplingFinderPanel extends PluginPanel {
                 int itemid = ImplingFinderImpPanel.getItemIdFromNpcId(id);
                 i = itemManager.getImage(itemid);
             }
-            ImplingButton b = new ImplingButton(i);
+            ImplingButton b = new ImplingButton(i, s);
             buttonList.add(b);
         }
 
