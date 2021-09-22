@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,7 +32,7 @@ public class ImplingFinderPanel extends PluginPanel {
     private final CardLayout cardLayout = new CardLayout();
 
     private JPanel impListPanel = new JPanel();
-    private JPanel container = new JPanel(cardLayout);
+    private JPanel implingListContainer = new JPanel(cardLayout);
     private final PluginErrorPanel errorPanel = new PluginErrorPanel();
     private final ImplingFinderSplashPanel splashPanel = new ImplingFinderSplashPanel();
 
@@ -52,11 +50,10 @@ public class ImplingFinderPanel extends PluginPanel {
 
     @Getter
     @Setter
-    private Integer requestedId = -1;
-
-    @Getter
-    @Setter
     private boolean fetchTargetedRequested = false;
+
+
+    protected List<ImplingFinderButton> buttonList = new ArrayList<ImplingFinderButton>();
 
     @Getter
     private boolean splashRequested = false;
@@ -82,11 +79,37 @@ public class ImplingFinderPanel extends PluginPanel {
         c.gridx = 0;
         c.anchor = GridBagConstraints.PAGE_START;
 
+        /*
+         * Mockup of overall Panel
+         *
+         * {
+         *     [(clear)        (Impling Finder)]  - clearButton, title
+         *  {
+         *     [(Recent)   (Magpie)  (Ninja)
+         *     (Crystal)  (Dragon)  (Lucky)   ]  - implingSelections (2x3 GridLayout)
+         *     [           (Fetch)            ]  - fetchButton
+         *  } - fetchPanel
+         * } - topContainer
+         *
+         * {
+         *        [ IMPLING LIST ]
+         * } - container
+         *
+         */
+
+        /*
+         * Subpanel for all buttons and info at top of the overall Impling Finder panel
+         */
         JPanel topContainer = new JPanel();
         topContainer.setLayout(new BorderLayout());
+        topContainer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                                                            ColorScheme.DARKER_GRAY_HOVER_COLOR));
 
+        /*
+         * Subpanel for title and clear button in top row of topContainer panel
+         */
         JPanel titlePanel = new JPanel();
-        titlePanel.setBorder(new EmptyBorder(10, 10, 10, 0));
+        titlePanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         titlePanel.setLayout(new BorderLayout());
 
         JLabel title = new JLabel();
@@ -94,77 +117,52 @@ public class ImplingFinderPanel extends PluginPanel {
         title.setForeground(Color.WHITE);
         titlePanel.add(title, BorderLayout.EAST);
 
-        JButton refreshButton = new JButton("Clear");
-        refreshButton.addActionListener(new ActionListener() {
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearRequested = true;
             }
         });
-        refreshButton.setForeground(Color.WHITE);
-        refreshButton.setRequestFocusEnabled(false);
-        titlePanel.add(refreshButton, BorderLayout.WEST);
+        clearButton.setForeground(Color.WHITE);
+        clearButton.setRequestFocusEnabled(false);
+        titlePanel.add(clearButton, BorderLayout.WEST);
+
+        topContainer.add(titlePanel, BorderLayout.NORTH);
+
+        /*
+         * Lower fetch panel, contains impling buttons and fetch button
+         */
 
         JPanel fetchPanel = new JPanel();
         fetchPanel.setLayout(new BorderLayout());
-        fetchPanel.setBorder(new EmptyBorder(0, 10, 5, 0));
+        fetchPanel.setBorder(new EmptyBorder(0, 0, 5, 0));
 
-        JComboBox<String> implingSelectionDropDown = new JComboBox<>(TargetableImplings);
-
-        DefaultListCellRenderer listRenderer = new DefaultListCellRenderer();
-        listRenderer.setRequestFocusEnabled(false);
-        listRenderer.setHorizontalAlignment(DefaultListCellRenderer.CENTER); // center-aligned items
-        listRenderer.setOpaque(false);
-        listRenderer.setForeground(ColorScheme.DARK_GRAY_COLOR);
-
-        implingSelectionDropDown.setForeground(Color.WHITE);
-        implingSelectionDropDown.setBorder(new CompoundBorder(implingSelectionDropDown.getBorder(), new EmptyBorder(0, 0, 0, 11)));
-        implingSelectionDropDown.setRenderer(listRenderer);
-        implingSelectionDropDown.setRequestFocusEnabled(false);
-        implingSelectionDropDown.setSelectedIndex(0);
-
-        //fetchPanel.add(implingSelectionDropDown, BorderLayout.WEST);
+        JPanel implingSelections = new JPanel(new GridLayout(2, 3));
+        implingSelections.setBorder(new EmptyBorder(0, -1, 3, -1));
+        populateButtonList();
+        for (JButton p : buttonList)
+            implingSelections.add(p);
+        fetchPanel.add(implingSelections, BorderLayout.NORTH);
 
         JButton fetchButton = new JButton("Fetch");
         fetchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 fetchRequested = true;
-                String requestedImpling = (String)implingSelectionDropDown.getSelectedItem();
-                requestedId = ImplingFinderEnum.getIdByNameFuzzy(requestedImpling);
             }
         });
         fetchButton.setForeground(Color.WHITE);
         fetchButton.setRequestFocusEnabled(false);
         fetchPanel.add(fetchButton, BorderLayout.SOUTH);
 
-        JPanel implingSelections = new JPanel(new GridLayout(2, 3));
-
-        List<ImplingButton> buttonList = new ArrayList<ImplingButton>();
-        for (String s : TargetableImplings) {
-            Image i;
-            int id = ImplingFinderEnum.getIdByNameFuzzy(s);
-            if (id == -1)
-                i = itemManager.getImage(ItemID.TEAK_CLOCK);
-            else {
-                int itemid = ImplingFinderImpPanel.getItemIdFromNpcId(id);
-                i = itemManager.getImage(itemid);
-            }
-            ImplingButton b = new ImplingButton(i, s);
-            buttonList.add(b);
-        }
-
-        for (JButton p : buttonList)
-            implingSelections.add(p);
-
-        fetchPanel.add(implingSelections, BorderLayout.NORTH);
-
-        topContainer.add(titlePanel, BorderLayout.NORTH);
         topContainer.add(fetchPanel, BorderLayout.SOUTH);
-        topContainer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARKER_GRAY_HOVER_COLOR));
-
 
         this.add(topContainer, BorderLayout.NORTH);
+
+        /*
+         * End topContainer, add impling list
+         */
 
         impListPanel.setLayout(new GridBagLayout());
         impListPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -183,12 +181,13 @@ public class ImplingFinderPanel extends PluginPanel {
         JPanel splashWrapper = new JPanel(new BorderLayout());
         splashWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
         splashPanel.setContent("Welcome to Impling Finder!",
-                " This plugin watches for implings around you, and uploads the locations of implings of Magpie quality" +
-                        " or higher to an external server. Uploads are only done when implings are actually found, so this plugin" +
-                        " has virtually 0 network usage. Please raise an issue in the github repo if you find one, or would like to request a feature!" +
-                        " This plugin crowdsources data, so the more people using it, the better. Tell your friends to install!" +
-                        " Try clicking on a found impling to see its precise location on your worldmap." +
-                        "\nMake sure to go to the config and check 'Splash Seen' so that you don't see this splash page again.\n\n");
+                " This plugin watches for implings around you, and uploads the locations of implings of" +
+                        " Magpie quality or higher to an external server. Try clicking on a found impling to see its" +
+                        " precise location on your worldmap. Make sure to go to the config and check 'Splash Seen' so" +
+                        " that you don't see this splash page again. Uploads are only done when implings are actually" +
+                        " found, so this plugin has virtually 0 network usage. Please raise an issue in the github repo" +
+                        " if you find one, or would like to request a feature! This plugin crowdsources data, so the" +
+                        " more people using it, the better. Tell your friends to install!");
         splashWrapper.add(splashPanel, BorderLayout.NORTH);
 
         JButton getStartedButton = new JButton("Let's get started");
@@ -200,28 +199,67 @@ public class ImplingFinderPanel extends PluginPanel {
         });
         splashWrapper.add(getStartedButton, BorderLayout.SOUTH);
 
-        container.add(splashWrapper, SPLASH_PANEL);
-        container.add(impsWrapper, RESULTS_PANEL);
-        container.add(errorWrapper, ERROR_PANEL);
+        implingListContainer.add(splashWrapper, SPLASH_PANEL);
+        implingListContainer.add(impsWrapper, RESULTS_PANEL);
+        implingListContainer.add(errorWrapper, ERROR_PANEL);
 
-        cardLayout.show(container, ERROR_PANEL);
+        cardLayout.show(implingListContainer, SPLASH_PANEL);
 
-        this.add(container, BorderLayout.CENTER);
+        this.add(implingListContainer, BorderLayout.CENTER);
     }
 
-    private JButton makeImplingButtonPanel(String buttonLabel) {
-        JPanel p = new JPanel();
-        JButton b = new JButton(buttonLabel);
-        p.add(b);
-        return b;
+    public void notifyButtonSelected(String s) {
+        for (ImplingFinderButton ib : buttonList) {
+            if ((s.equals("Recent") && !ib.getName().equals("Recent")) ||
+                    (!s.equals("Recent") && ib.getName().equals("Recent")))
+                ib.setSelected(false);
+            ib.paint(ib.getGraphics());
+        }
+    }
+
+    public List<Integer> getSelectedButtons() {
+        List<Integer> l = new ArrayList<>();
+        for (ImplingFinderButton ib : buttonList) {
+            if (ib.isSelected())
+                l.add(ImplingFinderEnum.getIdByNameFuzzy(ib.getName()));
+        }
+        return l;
+    }
+
+    private void populateButtonList() {
+        buttonList.clear();
+        for (String s : TargetableImplings) {
+            Image i;
+            int id = ImplingFinderEnum.getIdByNameFuzzy(s);
+            if (id == ImplingFinderPlugin.RECENT_IMPLINGS_ID)
+                i = itemManager.getImage(ItemID.TEAK_CLOCK);
+            else {
+                int itemid = ImplingFinderImpPanel.getItemIdFromNpcId(id);
+                i = itemManager.getImage(itemid);
+            }
+            ImplingFinderButton b = new ImplingFinderButton(i, s);
+
+            b.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    b.setSelected(!b.isSelected());
+                    notifyButtonSelected(b.getName());
+                }
+            });
+
+            // Always start with Recent selected
+            if (id == ImplingFinderPlugin.RECENT_IMPLINGS_ID)
+                b.setSelected(true);
+            buttonList.add(b);
+        }
     }
 
     public void showSplash() {
-        cardLayout.show(container, SPLASH_PANEL);
+        cardLayout.show(implingListContainer, SPLASH_PANEL);
     }
 
-    private void continuePastSplash() {
-        cardLayout.show(container, ERROR_PANEL);
+    public void continuePastSplash() {
+        cardLayout.show(implingListContainer, ERROR_PANEL);
     }
 
     public void populateNpcs(List<ImplingFinderData> npcs) {
@@ -231,21 +269,22 @@ public class ImplingFinderPanel extends PluginPanel {
         impListPanel.removeAll();
 
         if (npcs.size() == 0) {
-            cardLayout.show(container, ERROR_PANEL);
+            cardLayout.show(implingListContainer, ERROR_PANEL);
             return;
         }
-        cardLayout.show(container, RESULTS_PANEL);
+        cardLayout.show(implingListContainer, RESULTS_PANEL);
 
         List<JPanel> implings = new ArrayList<>();
         int defaultThumbnailId = ItemID.BABY_MOLERAT;
         for (ImplingFinderData npc : npcs) {
             JPanel marginWrapper = new JPanel(new BorderLayout());
             marginWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
-            marginWrapper.setBorder(new EmptyBorder(5, 0 ,0 ,0));
+            // Magic numbers yikes
+            marginWrapper.setBorder(new EmptyBorder(5, 0 ,0 ,-4));
 
             ImplingFinderImpPanel imp = new ImplingFinderImpPanel(itemManager, npc, defaultThumbnailId, plugin);
             imp.setAutoscrolls(true);
-            imp.setBorder(new EmptyBorder(3, 0 ,0 ,0));
+            imp.setBorder(new EmptyBorder(3, 0 ,0 ,7));
             marginWrapper.add(imp);
 
             implings.add(marginWrapper);

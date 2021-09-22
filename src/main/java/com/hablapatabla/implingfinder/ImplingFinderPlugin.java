@@ -90,6 +90,8 @@ public class ImplingFinderPlugin extends Plugin {
 
     protected static String implingPostEndpoint = "https://puos0bfgxc2lno5-implingdb.adb.us-phoenix-1.oraclecloudapps.com/ords/impling/implingdev/dev";
 
+    public static final int RECENT_IMPLINGS_ID = -1;
+
     @Provides
     ImplingFinderConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ImplingFinderConfig.class);
@@ -106,6 +108,7 @@ public class ImplingFinderPlugin extends Plugin {
     protected static final String CONFIG_GROUP = "Impling Finder";
     private static final int NPC_UPLOAD_TIME = 20;
     private static final int PANEL_REFRESH_TIME = 1;
+    private static final int GET_REQUEST_COOLDOWN_TIME = 2000;
 
     @Override
     protected void startUp() throws Exception {
@@ -113,6 +116,8 @@ public class ImplingFinderPlugin extends Plugin {
         loadPluginPanel();
         if (!config.beenOpened())
             panel.showSplash();
+        else
+            panel.continuePastSplash();
     }
 
     @Override
@@ -174,7 +179,7 @@ public class ImplingFinderPlugin extends Plugin {
     }
 
     private boolean isImpling(String name) {
-        return ImplingFinderEnum.getIdByNameStrict(name) != -1;
+        return ImplingFinderEnum.getIdByNameStrict(name) != RECENT_IMPLINGS_ID;
     }
 
     private boolean isImpling(int id) {
@@ -241,11 +246,13 @@ public class ImplingFinderPlugin extends Plugin {
             panel.setClearRequested(false);
         }
 
-        if (panel.isFetchRequested() && currTime - lastGetCall >= 4000) {
+        // 2 second wait between requests
+        if (panel.isFetchRequested() && currTime - lastGetCall >= GET_REQUEST_COOLDOWN_TIME) {
             remotelyFetchedImplings.clear();
-            webManager.getData(panel.getRequestedId());
+            remotelyFetchedImplings = webManager.getData(panel.getSelectedButtons());
             panel.setFetchRequested(false);
             lastGetCall = System.currentTimeMillis();
+            updatePanels();
         }
     }
 

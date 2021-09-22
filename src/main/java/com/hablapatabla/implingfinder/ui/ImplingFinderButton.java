@@ -11,28 +11,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
-class ImplingButton extends JButton {
+class ImplingFinderButton extends JButton {
+
     @Getter
     @Setter
-    private boolean selected = false;
+    private boolean selected;
 
     @Getter
     @Setter
     private String name;
 
-    ImplingButton(Image i, String name) {
+    ImplingFinderButton(Image i, String name) {
         super.setContentAreaFilled(false);
-
-        this.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                selected = !selected;
-            }
-        });
-
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setFocusPainted(false);
         this.setRequestFocusEnabled(false);
+        this.selected = false;
         this.name = name;
         this.setIcon(new ImageIcon(i));
         setBorder(new EtchedBorder());
