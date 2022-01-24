@@ -1,2 +1,2 @@
-# Impling Finder
+# Impling Finder [![](https://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/rank/plugin/impling-finder)](https://runelite.net/plugin-hub)
 Crowd-sourced impling location data. Uses an Oracle Cloud backend to store and manage found implings. Always-on and uploads locations of nearby implings, and can download a recent list of found implings from other players.
