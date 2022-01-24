@@ -38,8 +38,8 @@ public interface ImplingFinderConfig extends Config
     @ConfigItem(
             position = 2,
             keyName = "showImpType",
-            name = "I'm a cool Kid",
-            description = "Only cool kids leave this checked"
+            name = "I'm a cool kid",
+            description = "Only cool kids leave this checked!"
     )
     default boolean showImpType() {
         return false;
