@@ -15,6 +15,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -75,6 +76,9 @@ public class ImplingFinderPlugin extends Plugin {
     @Inject
     private WorldService worldService;
 
+    @Inject
+    private Notifier notifier;
+
     @Getter(AccessLevel.PACKAGE)
     private NavigationButton button = null;
 
@@ -103,12 +107,15 @@ public class ImplingFinderPlugin extends Plugin {
 
     private boolean mapPointSet = false;
     private boolean displayingButton = true;
+    private boolean wantSpawnNotifications = false;
     private long lastGetCall = System.currentTimeMillis();
 
     protected static final String CONFIG_GROUP = "Impling Finder";
     private static final int NPC_UPLOAD_TIME = 20;
     private static final int PANEL_REFRESH_TIME = 1;
     private static final int GET_REQUEST_COOLDOWN_TIME = 2000;
+
+
 
     @Override
     protected void startUp() throws Exception {
@@ -160,6 +167,8 @@ public class ImplingFinderPlugin extends Plugin {
                 case ImplingFinderConfig.GET_ENDPOINT_KEYNAME:
                     implingGetAnyEndpoint = config.implingFinderGetEndpointConfig();
                     break;
+                case ImplingFinderConfig.IMPLING_SPAWN_NOTIFY:
+                    wantSpawnNotifications = config.implingSpawnNotify();
             }
         }
     }
@@ -172,6 +181,9 @@ public class ImplingFinderPlugin extends Plugin {
 
         if (!isImpling(npc.getName()))
             return;
+
+        if (wantSpawnNotifications)
+            notifier.notify("An impling just spawned!");
 
         ImplingFinderData imp = makeImp(npc);
         logger.error(imp.toString());

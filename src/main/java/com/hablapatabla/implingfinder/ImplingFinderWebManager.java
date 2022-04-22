@@ -43,7 +43,6 @@ public class ImplingFinderWebManager {
 
     protected void postImplings() {
         try {
-            logger.error("HTTP POST Malone");
             // Oracle cloud only handles 1 JSON object to be posted at a time
             for (ImplingFinderData data : plugin.getImplingsToUpload()) {
                 Request r = new Request.Builder()

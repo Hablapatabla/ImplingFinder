@@ -11,7 +11,6 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.AsyncBufferedImage;
-import net.runelite.http.api.npc.NpcInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +40,6 @@ class ImplingFinderImpPanel extends JPanel {
 
     // npc id to ItemID
     private static Map<Integer, Integer> thumbnails = new HashMap<Integer, Integer>() {{
-        /*put(NpcID.BABY_IMPLING, ItemID.BABY_IMPLING_JAR);
-        put(NpcID.YOUNG_IMPLING, ItemID.YOUNG_IMPLING_JAR);
-        put(NpcID.GOURMET_IMPLING, ItemID.GOURMET_IMPLING_JAR);
-        put(NpcID.EARTH_IMPLING, ItemID.EARTH_IMPLING_JAR);
-        put(NpcID.ESSENCE_IMPLING, ItemID.ESSENCE_IMPLING_JAR);*/
-        //put(NpcID.ECLECTIC_IMPLING, ItemID.ECLECTIC_IMPLING_JAR);
-        //put(NpcID.NATURE_IMPLING, ItemID.NATURE_IMPLING_JAR);
         put(NpcID.MAGPIE_IMPLING, ItemID.MAGPIE_IMPLING_JAR);
         put(NpcID.NINJA_IMPLING, ItemID.NINJA_IMPLING_JAR);
         put(NpcID.CRYSTAL_IMPLING, ItemID.CRYSTAL_IMPLING_JAR);

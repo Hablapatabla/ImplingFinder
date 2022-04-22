@@ -12,6 +12,7 @@ public interface ImplingFinderConfig extends Config
     String POST_ENDPOINT_KEYNAME = "post endpoint";
     String GET_ENDPOINT_KEYNAME = "get endpoint";
     String SPLASH_SEEN = "splashSeen";
+    String IMPLING_SPAWN_NOTIFY = "spawnNotify";
 
     @ConfigItem(
             keyName = POST_ENDPOINT_KEYNAME,
@@ -47,14 +48,23 @@ public interface ImplingFinderConfig extends Config
 
     @ConfigItem(
             position = 3,
-            keyName = "hideButton",
+            keyName = IMPLING_SPAWN_NOTIFY,
+            name = "Spawn Notification",
+            description = "Notifies you if an impling spawns nearby"
+    )
+    default boolean implingSpawnNotify() { return false; }
+
+
+    @ConfigItem(
+            position = 4,
+            keyName = HIDE_BUTTON,
             name = "Hide Button",
             description = "Hides the button from your Runelite sidebar"
     )
     default boolean hideButton() { return false; }
 
     @ConfigItem(
-            position = 4,
+            position = 5,
             keyName = "uninstallMessage",
             name = "Secret message!",
             description = "There's a secret message in this dropdown"
@@ -65,10 +75,21 @@ public interface ImplingFinderConfig extends Config
     }
 
     @ConfigItem(
-            position = 5,
+            position = 6,
             keyName = "splashSeen",
             name = "I've seen the splash page",
             description = "This plugin has been opened before"
     )
     default boolean beenOpened() { return false; }
+
+    @ConfigItem(
+            keyName = "issue",
+            position = 7,
+            name = "Got an issue?",
+            description = "Go to this link if you have an issue or want to request a feature. I probably won't do it, but it's worth a shot!"
+    )
+    default String issue()
+    {
+        return "https://github.com/Hablapatabla/ImplingFinder/issues/new";
+    }
 }
