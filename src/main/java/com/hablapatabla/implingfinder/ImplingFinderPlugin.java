@@ -45,7 +45,6 @@ import java.util.*;
         tags = {"config", "menu", "impling", "finder", "hunter", "group",
                     "fun", "crowdsource", "crowd", "party", "implingfinder", "impling finder",
                     "clue", "clue scroll", "medium clue", "Impling Finder", "Impling", "Finder"},
-        loadWhenOutdated = true,
         enabledByDefault = true
 )
 public class ImplingFinderPlugin extends Plugin {
