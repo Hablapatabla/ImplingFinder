@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = 'com.implingfinder'
-version = '1.0.14.2'
+version = '1.4'
 sourceCompatibility = '11'
 
 tasks.withType(JavaCompile) {
